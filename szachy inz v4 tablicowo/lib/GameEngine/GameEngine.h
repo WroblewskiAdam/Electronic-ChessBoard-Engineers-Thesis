@@ -102,8 +102,8 @@ class GameEngine
         
         void get_king_allowed_moves();
         void get_castling_moves(std::array<std::array<std::string, 8>, 8> &myArray);
-        bool short_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray);
-        bool long_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray);
+        bool short_castling_condition(int &king_row, std::array<std::array<std::string, 8>, 8> &myArray);
+        bool long_castling_condition(int &king_row, std::array<std::array<std::string, 8>, 8> &myArray);
 
         std::array<int,2> get_king_cords(const std::array<std::array<std::string, 8>, 8> &myArray);
         std::array<int,2> get_only_one_cords(const std::array<std::array<int, 8>, 8> &myArray);

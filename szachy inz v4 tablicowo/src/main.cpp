@@ -1,4 +1,3 @@
-#pragma once
 #include <Arduino.h>
 #include <detector.h>
 #include <moveSolver.h>
@@ -28,14 +27,14 @@ char figures_full[8][8] ={{'r','n','b','q','k','b','n','r'},
                           {'P','P','P','P','P','P','P','P'},
                           {'R','N','B','Q','K','B','N','R'}};
 
-char figures[8][8] = {{'0','0','0','r','0','k','0','0'},
-                      {'0','0','0','0','0','0','0','0'},
-                      {'b','0','0','0','Q','0','0','0'},
-                      {'0','0','0','0','0','0','0','0'},
-                      {'0','0','0','0','0','0','0','0'},
-                      {'0','0','0','0','0','0','0','0'},
-                      {'0','0','0','0','K','0','0','0'},
-                      {'0','0','0','0','0','0','0','0'}};
+char figures[8][8] =     {{'r','n','b','q','k','b','n','r'},
+                          {'p','p','p','p','p','0','0','p'},
+                          {'0','0','0','0','0','0','0','0'},
+                          {'0','0','0','0','0','0','0','0'},
+                          {'0','0','0','0','0','0','0','0'},
+                          {'0','0','0','0','0','0','0','0'},
+                          {'P','P','P','P','0','P','P','P'},
+                          {'R','N','B','Q','K','B','N','R'}};
 
 int row = 0;
 int col = 0;
@@ -113,6 +112,25 @@ bool check_vals()
   else return false;
 }
 
+void end_game()
+{
+  Serial.print("Stan gry: ");
+  if(myGameEngine.evaluate_stalemate())
+  {
+    Serial.println("REMIS");
+  }
+  else if(myGameEngine.evaluate_checkmate())
+  {
+    Serial.print("WYGRYWAJĄ ");
+    Serial.println((myGameEngine.whites_turn)? "CZARNE" : "BIAŁE");
+  }
+  else
+  {
+    Serial.println("nierozstrzygnięta");
+  }
+}
+
+
 void setup() {
   Serial.begin(115200);
   
@@ -121,18 +139,19 @@ void setup() {
   myGameEngine.init_board(figures);
   // myGameEngine.board[0][0] = "r";
   // myGameEngine.whites_turn = false;
-  myGameEngine.print_board(myGameEngine.board,0);
-  delay(2000);
+  act = 1;  
 }
 
 void loop() {
-
   if(act == 1)
   {
     Serial.print("plansza ( ruch  ");
     if(myGameEngine.whites_turn) Serial.print("białych");
     else Serial.print("czarnych");
     Serial.println("  ):");
+    end_game();
+    
+
     myGameEngine.print_board(myGameEngine.board,0);
 
     act = 0;

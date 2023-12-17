@@ -138,6 +138,8 @@ std::array<int,2> GameEngine::get_king_cords(const std::array<std::array<std::st
             }
         }
     }
+    cords = {0,0};
+    return cords;
 } 
 
 
@@ -150,6 +152,8 @@ std::array<int,2> GameEngine::get_only_one_cords(const std::array<std::array<int
             if(myArray[i][j] == 1) return cords = {i,j};
         }
     }
+    cords = {0, 0};
+    return cords;
 } 
 
 
@@ -349,7 +353,7 @@ bool GameEngine::check_move_for_check(int row, int col ,int new_row, int new_col
     int checking_num = sum_array(checking_figures);
     
     if(checking_num >= 1) return true;
-    if(checking_num == 0) return false;
+    else if(checking_num == 0) return false;
 } 
 
 
@@ -380,9 +384,8 @@ void GameEngine::get_king_allowed_moves()
 void GameEngine::get_castling_moves(std::array<std::array<std::string, 8>, 8> &myArray)
 {
     std::array<int,2> king_pos = get_king_cords(myArray);
-    bool short_castling = short_castling_condition(king_pos[0], king_pos[1], board);
-    bool long_castling = long_castling_condition(king_pos[0], king_pos[1], board);
-
+    bool short_castling = short_castling_condition(king_pos[0], board);
+    bool long_castling = long_castling_condition(king_pos[0], board);
     if(short_castling)
     {
         king_allowed_moves[king_pos[0]][6] = 1;
@@ -394,23 +397,22 @@ void GameEngine::get_castling_moves(std::array<std::array<std::string, 8>, 8> &m
 }
 
 
-bool GameEngine::short_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray)
+bool GameEngine::short_castling_condition(int &king_row, std::array<std::array<std::string, 8>, 8> &myArray)
 {
-    int rook_row = king_row;
-    int rook_col = 7;
-    std::string k_fig  = myArray[king_row][king_col];
-    std::string r_fig = myArray[rook_row][rook_col];
-
-    if ((k_fig == "K_" || k_fig =="k_") && (r_fig == "R_" || r_fig =="r_")) // wieza i krol nie wykonaly ruchu
+    if ((myArray[king_row][4] == "K_" || myArray[king_row][4] =="k_") && (myArray[king_row][7] == "R_" || myArray[king_row][7] == "r_")) // wieza i krol nie wykonaly ruchu
     {
         if(myArray[king_row][5] == "0" && myArray[king_row][6] == "0") // nie ma bierek pomiedzy K a R
         {
-            bool check_1 = check_move_for_check(king_row, king_col, king_row, 5); //true jesli szach
-            bool check_2 = check_move_for_check(king_row, king_col, king_row, 6); // true jesli szach
+            bool check_1 = check_move_for_check(king_row, 4, king_row, 5); //true jesli szach
+            bool check_2 = check_move_for_check(king_row, 4, king_row, 6); // true jesli szach
             if( !check_1 && !check_2 )
             {
                 return true;
             }
+        }
+        else
+        {
+            return false;
         }
     }
     else
@@ -419,24 +421,22 @@ bool GameEngine::short_castling_condition(int king_row, int king_col, std::array
     }
 }
 
-
-bool GameEngine::long_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray)
+bool GameEngine::long_castling_condition(int &king_row, std::array<std::array<std::string, 8>, 8> &myArray)
 {
-    int rook_row = king_row;
-    int rook_col = 0;
-    std::string k_fig  = myArray[king_row][king_col];
-    std::string r_fig = myArray[rook_row][rook_col];
-
-    if ((k_fig == "K_" || k_fig =="k_") && (r_fig == "R_" || r_fig =="r_")) // wieza i krol nie wykonaly ruchu
+    if ((myArray[king_row][4] == "K_" || myArray[king_row][4] =="k_") && (myArray[king_row][0] == "R_" || myArray[king_row][0] == "r_")) // wieza i krol nie wykonaly ruchu
     {
         if(myArray[king_row][1] == "0" && myArray[king_row][2] == "0" && myArray[king_row][3] == "0") // nie ma bierek pomiedzy K a R
         {
-            bool check_1 = check_move_for_check(king_row, king_col, king_row, 2); //true jesli szach
-            bool check_2 = check_move_for_check(king_row, king_col, king_row, 3); // true jesli szach
+            bool check_1 = check_move_for_check(king_row, 4, king_row, 2); //true jesli szach
+            bool check_2 = check_move_for_check(king_row, 4, king_row, 3); // true jesli szach
             if( !check_1 && !check_2 )
             {
                 return true;
             }
+        }
+        else
+        {
+            return false;
         }
     }
     else
@@ -444,15 +444,85 @@ bool GameEngine::long_castling_condition(int king_row, int king_col, std::array<
         return false;
     }
 }
+
+// bool GameEngine::long_castling_condition(int &king_row, std::array<std::array<std::string, 8>, 8> &myArray)
+// {
+//     if ((myArray[king_row][4] == "K_" || myArray[king_row][4] =="k_") && (myArray[king_row][0] == "R_" || myArray[king_row][0] == "r_")) // wieza i krol nie wykonaly ruchu
+//     {
+//         if(myArray[king_row][1] == "0" && myArray[king_row][2] == "0" && myArray[king_row][3] == "0") // nie ma bierek pomiedzy K a R
+//         {
+//             bool check_1 = check_move_for_check(king_row, 4, king_row, 2); //true jesli szach
+//             bool check_2 = check_move_for_check(king_row, 4, king_row, 3); // true jesli szach
+//             if( !check_1 && !check_2 )
+//             {
+//                 return true;
+//             }
+//         }
+//     }
+//     else
+//     {
+//         return false;
+//     }
+// }
 
 
 bool GameEngine::evaluate_checkmate()
 {
-    // TODO
+    get_checking_figures(board);
+    int num_of_checking = sum_array(checking_figures);
+
+    if(num_of_checking > 0)
+    {
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++)
+            {
+                if(whites_turn && isupper(board[i][j][0]) && board[i][j][0] != '0') // tylko figury białe
+                {
+                    get_final_moves_for_figure(i, j);
+                    if(sum_array(final_moves_for_figure) != 0) return false;
+
+                }
+                else if(!whites_turn && islower(board[i][j][0]) && board[i][j][0] != '0') // tylko figury czarne
+                {
+                    get_final_moves_for_figure(i, j);
+                    if(sum_array(final_moves_for_figure) != 0) return false;
+                }
+            }
+        }
+        return true;
+    }
+    else return false;
 }
 
 
 bool GameEngine::evaluate_stalemate()
 {
-    // TODO
+    get_checking_figures(board);
+    int num_of_checking = sum_array(checking_figures);
+
+    if(num_of_checking == 0)
+    {
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++)
+            {
+                if(whites_turn && isupper(board[i][j][0]) && board[i][j][0] != '0') // tylko figury białe
+                {
+                    get_final_moves_for_figure(i, j);
+                    if(sum_array(final_moves_for_figure) != 0) return false;
+
+                }
+                else if(!whites_turn && islower(board[i][j][0]) && board[i][j][0] != '0') // tylko figury czarne
+                {
+                    get_final_moves_for_figure(i, j);
+                    if(sum_array(final_moves_for_figure) != 0) return false;
+                }
+                
+            }
+        }
+        return true;
+    }
+    else return false;
+
 }
