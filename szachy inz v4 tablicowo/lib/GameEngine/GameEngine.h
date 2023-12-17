@@ -110,6 +110,10 @@ class GameEngine
         int sum_array(const std::array<std::array<int, 8>, 8> &myArray);
         void clear_board(std::array<std::array<std::string, 8>, 8> &myArray);
         void clear_array(std::array<std::array<int, 8>, 8> &myArray);
+        void get_castling_moves(std::array<std::array<std::string, 8>, 8> &myArray);
+        bool short_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray);
+        bool long_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray);
+        bool castling_left_condition(std::array<std::array<std::string, 8>, 8> &myArray);
 
 
 };
