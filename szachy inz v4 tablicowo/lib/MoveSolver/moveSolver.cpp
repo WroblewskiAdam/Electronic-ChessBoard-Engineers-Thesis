@@ -6,10 +6,11 @@ MoveSolver::MoveSolver()
 }
 
  
-void MoveSolver::get_all_moves_for_figure(int row, int col, const std::string (&myArray)[8][8])
+void MoveSolver::get_all_moves_for_figure(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {	
     clear_array(fig_moves);
     clear_array(fig_strikes);
+    clear_array(fig_all_moves);
     std::string figure = myArray[row][col]; 
 	if (figure == "P" || figure == "P_" || figure == "p" || figure == "p_") get_pawn_moves(row, col, myArray);
     if (figure == "R" || figure == "R_" || figure == "r" || figure == "r_") get_rook_moves(row, col, myArray);
@@ -17,10 +18,11 @@ void MoveSolver::get_all_moves_for_figure(int row, int col, const std::string (&
     if (figure == "B" || figure == "B_" || figure == "b" || figure == "b_") get_bishop_moves(row, col, myArray);
     if (figure == "Q" || figure == "Q_" || figure == "q" || figure == "q_") get_queen_moves(row, col, myArray);
     if (figure == "K" || figure == "K_" || figure == "k" || figure == "k_") get_king_moves(row, col, myArray);
+    combine_moves_strikes();
 }
 
 
-void MoveSolver::clear_array(int (&myArray)[8][8])
+void MoveSolver::clear_array(std::array<std::array<int, 8>, 8> &myArray)
 {
     for(int i = 0; i < 8; i++)
     {
@@ -32,7 +34,7 @@ void MoveSolver::clear_array(int (&myArray)[8][8])
 }
 
 
-void MoveSolver::displayFigData(const int (&myArray)[8][8], bool compact)
+void MoveSolver::print_array(const std::array<std::array<int, 8>, 8> &myArray, bool compact)
 {
   for(int i = 0; i < 8; i++)
   {
@@ -49,7 +51,7 @@ void MoveSolver::displayFigData(const int (&myArray)[8][8], bool compact)
 }
 
 
-void MoveSolver::get_pawn_moves(int row, int col, const std::string (&myArray)[8][8])
+void MoveSolver::get_pawn_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {
     std::string moving_figure = myArray[row][col];
     std::string attacked_figure;
@@ -134,7 +136,7 @@ void MoveSolver::get_pawn_moves(int row, int col, const std::string (&myArray)[8
 }
 
 
-void MoveSolver::get_rook_moves(int row, int col, const std::string (&myArray)[8][8])
+void MoveSolver::get_rook_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {   
     std::string moving_figure = myArray[row][col];
     std::string attacked_figure;
@@ -229,7 +231,7 @@ void MoveSolver::get_rook_moves(int row, int col, const std::string (&myArray)[8
 }
 
 
-void MoveSolver::get_bishop_moves(int row, int col, const std::string (&myArray)[8][8])
+void MoveSolver::get_bishop_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {   
     std::string moving_figure = myArray[row][col];
     std::string attacked_figure;
@@ -324,14 +326,14 @@ void MoveSolver::get_bishop_moves(int row, int col, const std::string (&myArray)
 }
 
 
-void MoveSolver::get_queen_moves(int row, int col, const std::string (&myArray)[8][8])
+void MoveSolver::get_queen_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {
     get_rook_moves(row, col, myArray);
     get_bishop_moves(row, col, myArray);
 }
 
 
-void MoveSolver::get_knight_moves(int row, int col, const std::string (&myArray)[8][8])
+void MoveSolver::get_knight_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {
     int row_inc[8] = { 1,  2, 2, 1, -1, -2, -2, -1};
     int col_inc[8] = {-2, -1, 1, 2,  2,  1, -1, -2};
@@ -357,7 +359,7 @@ void MoveSolver::get_knight_moves(int row, int col, const std::string (&myArray)
 }
 
 
-void MoveSolver::get_king_moves(int row, int col, const std::string (&myArray)[8][8])
+void MoveSolver::get_king_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {
     int row_inc[8] = {-1, -1, -1,  0, 0,  1, 1, 1};
     int col_inc[8] = {-1,  0,  1, -1, 1, -1, 0, 1};
@@ -407,3 +409,19 @@ int MoveSolver::check_move_type(char moving_figure, char figure_on_possible_pos)
         else if (figure_on_possible_pos == '0') return 0;
     }
 }
+
+void MoveSolver::combine_moves_strikes()
+{
+    clear_array(fig_all_moves);
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(fig_moves[i][j] == 1 || fig_strikes[i][j] == 1) 
+            {
+                fig_all_moves[i][j] = 1;
+            }
+        }   
+    }
+}
+
