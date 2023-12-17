@@ -353,7 +353,7 @@ bool GameEngine::check_move_for_check(int row, int col ,int new_row, int new_col
     int checking_num = sum_array(checking_figures);
     
     if(checking_num >= 1) return true;
-    else if(checking_num == 0) return false;
+    else return false;
 } 
 
 
@@ -405,10 +405,8 @@ bool GameEngine::short_castling_condition(int &king_row, std::array<std::array<s
         {
             bool check_1 = check_move_for_check(king_row, 4, king_row, 5); //true jesli szach
             bool check_2 = check_move_for_check(king_row, 4, king_row, 6); // true jesli szach
-            if( !check_1 && !check_2 )
-            {
-                return true;
-            }
+            if( !check_1 && !check_2 ) return true;
+            else return false;
         }
         else
         {
@@ -429,10 +427,8 @@ bool GameEngine::long_castling_condition(int &king_row, std::array<std::array<st
         {
             bool check_1 = check_move_for_check(king_row, 4, king_row, 2); //true jesli szach
             bool check_2 = check_move_for_check(king_row, 4, king_row, 3); // true jesli szach
-            if( !check_1 && !check_2 )
-            {
-                return true;
-            }
+            if( !check_1 && !check_2 ) return true;
+            else return false;
         }
         else
         {
