@@ -133,8 +133,12 @@ void MoveSolver::get_pawn_moves(int row, int col, const std::array<std::array<st
             {
                 attacked_figure = myArray[new_row][new_col];
                 move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+   
                 if(move_type == -1) fig_strikes[new_row][new_col] = 1;
-                if(new_col == white_en_passant_col) fig_strikes[new_row][new_col] = 1; // en pasant
+                if(new_col == white_en_passant_col) 
+                {
+                    fig_strikes[new_row][new_col] = 1; // en pasant
+                }
             }
         }
     }
@@ -175,6 +179,8 @@ void MoveSolver::get_pawn_moves(int row, int col, const std::array<std::array<st
             }
         }
     }
+
+   
 }
 
 
@@ -190,18 +196,21 @@ void MoveSolver::get_rook_moves(int row, int col, const std::array<std::array<st
     {
         new_row = row - i;
         new_col = col;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
 
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop1;
-        }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop1;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop1;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop1;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }
         }
     }
     exitloop1:
@@ -210,18 +219,21 @@ void MoveSolver::get_rook_moves(int row, int col, const std::array<std::array<st
     {
         new_row = row + i;
         new_col = col;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
-       
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop2;
-        }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop2;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop2;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop2;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }
         }
     }
     exitloop2:
@@ -230,18 +242,21 @@ void MoveSolver::get_rook_moves(int row, int col, const std::array<std::array<st
     {
         new_row = row;
         new_col = col + i;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
 
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop3;
-        }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop3;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop3;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop3;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }
         }
     }
     exitloop3:
@@ -250,18 +265,21 @@ void MoveSolver::get_rook_moves(int row, int col, const std::array<std::array<st
     {
         new_row = row;
         new_col = col - i;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
 
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop4;
-        }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop4;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop4;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop4;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }
         }
     }
     exitloop4:
@@ -285,19 +303,23 @@ void MoveSolver::get_bishop_moves(int row, int col, const std::array<std::array<
     {
         new_row = row - i;  // prawy gorny ukos
         new_col = col + i;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
 
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop1;
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop1;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop1;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }
         }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop1;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
-        }
+       
     }
     exitloop1:
 
@@ -305,18 +327,21 @@ void MoveSolver::get_bishop_moves(int row, int col, const std::array<std::array<
     {       
         new_row = row + i; // prawy dolny ukos
         new_col = col + i;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
-       
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop2;
-        }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop2;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop2;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop2;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }
         }
     }
     exitloop2:
@@ -325,18 +350,21 @@ void MoveSolver::get_bishop_moves(int row, int col, const std::array<std::array<
     {
         new_row = row + i; // lewy dolny ukos
         new_col = col - i;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
 
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop3;
-        }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop3;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop3;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop3;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }   
         }
     }
     exitloop3:
@@ -345,18 +373,21 @@ void MoveSolver::get_bishop_moves(int row, int col, const std::array<std::array<
     {
         new_row = row - i; // lewy gorny ukos
         new_col = col - i;
-        attacked_figure = myArray[new_row][new_col];
-        move_type = check_move_type(moving_figure[0], attacked_figure[0]);
+        if(in_range(new_row, new_col))
+        {
+            attacked_figure = myArray[new_row][new_col];
+            move_type = check_move_type(moving_figure[0], attacked_figure[0]);
 
-        if (!in_range(new_row, new_col) || move_type == 1){
-            goto exitloop4;
-        }
-        else if (move_type == -1){
-            fig_strikes[new_row][new_col] = 1;
-            goto exitloop4;
-        }
-        else if (move_type == 0){
-            fig_moves[new_row][new_col] = 1;
+            if (!in_range(new_row, new_col) || move_type == 1){
+                goto exitloop4;
+            }
+            else if (move_type == -1){
+                fig_strikes[new_row][new_col] = 1;
+                goto exitloop4;
+            }
+            else if (move_type == 0){
+                fig_moves[new_row][new_col] = 1;
+            }
         }
     }
     exitloop4:
@@ -425,5 +456,4 @@ void MoveSolver::get_king_moves(int row, int col, const std::array<std::array<st
         }
     }
 }
-
 

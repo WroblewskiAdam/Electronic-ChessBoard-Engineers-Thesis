@@ -172,7 +172,6 @@ void GameEngine::get_checking_figures(const std::array<std::array<std::string, 8
 {
     clear_array(checking_figures);
     std::array<int,2> king_pos = get_king_cords(myBoard);
-
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
@@ -358,10 +357,9 @@ void GameEngine::get_king_allowed_moves()
 {
     clear_array(king_allowed_moves);
     std::array<int,2> king_pos = get_king_cords(board);
-    
+
     moveSolver.get_all_moves_for_figure(king_pos[0], king_pos[1], board);
     king_allowed_moves = moveSolver.fig_all_moves;
-
   
     bool check;
     for(int i = 0; i < 8; i++)

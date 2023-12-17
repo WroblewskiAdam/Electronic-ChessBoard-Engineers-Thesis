@@ -10,8 +10,8 @@ class MoveSolver
         void get_all_moves_for_figure(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);
         void print_array(const std::array<std::array<int, 8>, 8> &myArray, bool compact);
         
-        int white_en_passant_col = NULL;
-        int black_en_passant_col = NULL;
+        int white_en_passant_col = -1;
+        int black_en_passant_col = -1;
 
         std::array<std::array<int, 8>, 8> fig_moves = {{{0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0},
