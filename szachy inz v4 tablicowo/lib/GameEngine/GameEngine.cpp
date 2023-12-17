@@ -1,11 +1,11 @@
 #include <GameEngine.h>
 
-// TODO roszada
 
 GameEngine::GameEngine()
 {
   
 }
+
 
 void GameEngine::init_board(const char (&myArray)[8][8]){
     clear_board(board);
@@ -22,6 +22,7 @@ void GameEngine::init_board(const char (&myArray)[8][8]){
     }
 }
 
+
 void GameEngine::clear_board(std::array<std::array<std::string, 8>, 8> &myArray){
     for(int i = 0; i < 8; i++)
     {
@@ -31,6 +32,7 @@ void GameEngine::clear_board(std::array<std::array<std::string, 8>, 8> &myArray)
         }
     }
 }
+
 
 void GameEngine::print_board(const std::array<std::array<std::string, 8>, 8> &myArray, bool compact)
 {
@@ -73,6 +75,7 @@ void GameEngine::print_board(const std::array<std::array<std::string, 8>, 8> &my
     Serial.println();
 }
 
+
 void GameEngine::print_board(const std::array<std::array<int, 8>, 8> &myArray, bool compact)
 {
   for(int i = 0; i < 8; i++)
@@ -98,7 +101,6 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
         board[row][col] = "0";
     }
     change_turn();
-    move_counter ++;
     // TODO dodac ustawianie flagi do en passant przy ruchu piona
 }
 
@@ -138,6 +140,7 @@ std::array<int,2> GameEngine::get_king_cords(const std::array<std::array<std::st
     }
 } 
 
+
 std::array<int,2> GameEngine::get_only_one_cords(const std::array<std::array<int, 8>, 8> &myArray){
     std::array<int,2> cords;
     for(int i = 0; i < 8; i++)
@@ -148,6 +151,21 @@ std::array<int,2> GameEngine::get_only_one_cords(const std::array<std::array<int
         }
     }
 } 
+
+
+void GameEngine::change_turn()
+{
+    whites_turn = (whites_turn) ? false : true;
+}
+
+
+void GameEngine::clear_array(std::array<std::array<int, 8>, 8> &myArray)
+{
+    for(int i = 0; i < 8; i++)
+    {
+        myArray[i].fill(0);
+    }
+}
 
 
 void GameEngine::get_checking_figures(const std::array<std::array<std::string, 8>, 8> &myBoard)
@@ -173,126 +191,11 @@ void GameEngine::get_checking_figures(const std::array<std::array<std::string, 8
     }
 }
 
-void GameEngine::get_king_allowed_moves()
-{
-    clear_array(king_allowed_moves);
-    std::array<int,2> king_pos = get_king_cords(board);
-    
-    moveSolver.get_all_moves_for_figure(king_pos[0], king_pos[1], board);
-    king_allowed_moves = moveSolver.fig_all_moves;
 
-    get_checking_figures(board); // chyba nie potrzebne ?
-    
-    board_cpy = board;
-    board_cpy[king_pos[0]][king_pos[1]] = "0";
-
-    
-    for(int i = 0; i < 8; i++)
-    {
-        for(int j = 0; j < 8; j++)
-        {
-            if(whites_turn && islower(board[i][j][0]) && board[i][j][0] != '0') //czarne bierki
-            {
-                moveSolver.get_all_moves_for_figure(i,j,board_cpy);
-            }
-            else if (!whites_turn && isupper(board[i][j][0]) && board[i][j][0] != '0') //białe bierki
-            {
-                moveSolver.get_all_moves_for_figure(i,j,board_cpy);
-
-            }
-
-
-            for(int n = 0; n < 8; n++) // przejscie po mozliwych ruchach króla
-            {
-                for(int m = 0; m < 8; m++)
-                {
-                    if(tolower(board[i][j][0]) == 'p' && king_allowed_moves[n][m] == 1 && moveSolver.fig_strikes[n][m] == 1)
-                    {
-                        king_allowed_moves[n][m] = 0;
-                    }
-                    else if(tolower(board[i][j][0]) != 'p' && king_allowed_moves[n][m] == 1 && moveSolver.fig_moves[n][m] == 1)
-                    {
-                        king_allowed_moves[n][m] = 0;
-                    }
-                    
-                }
-            }           
-        }
-    }
-}
-
-
-void GameEngine::get_king_allowed_moves2()
-{
-    clear_array(king_allowed_moves);
-    std::array<int,2> king_pos = get_king_cords(board);
-    
-    moveSolver.get_all_moves_for_figure(king_pos[0], king_pos[1], board);
-    king_allowed_moves = moveSolver.fig_all_moves;
-
-  
-    bool check;
-    for(int i = 0; i < 8; i++)
-    {
-        for(int j = 0; j < 8; j++)
-        {
-            if(king_allowed_moves[i][j] == 1)
-            {
-                check = check_move_for_check(king_pos[0], king_pos[1], i, j);
-                if(check) king_allowed_moves[i][j] = 0;
-            }
-        }
-    }
-    get_castling_moves(board);
-}
-
-
-void GameEngine::get_check_saving_figures()
-{   
-    clear_array(check_saving_figures);
-    get_checking_figures(board);
-    int num_of_checking_figs = sum_array(checking_figures);
-    
-    get_check_saving_moves();
-
-    if(num_of_checking_figs == 1)
-    {
-        std::array<int,2> checking_cords = get_only_one_cords(checking_figures);
-        for(int i = 0; i < 8; i++)
-        {
-            for(int j = 0; j < 8; j++) //dla kazdej figury gracza otrzymujemy jej ruchy, sprawdzamy czy rych figury jest w ruchach które moga zablokować szacha
-            {
-                if(whites_turn && isupper(board[i][j][0]) && board[i][j][0] != '0' && board[i][j][0] != 'K') // tylko figury biale
-                {
-                    moveSolver.get_all_moves_for_figure(i, j, board);
-                    for(int n = 0; n < 8; n++)
-                    {
-                        for(int m = 0; m < 8; m++)
-                        {
-                            if(moveSolver.fig_all_moves[n][m] == 1 && check_saving_moves[n][m] == 1) check_saving_figures[i][j] = 1;
-                        }
-                    }
-                }
-                if(!whites_turn && islower(board[i][j][0]) && board[i][j][0] != '0' && board[i][j][0] != 'k') // tylko figury czarne
-                {
-                    moveSolver.get_all_moves_for_figure(i, j, board);
-                    for(int n = 0; n < 8; n++)
-                    {
-                        for(int m = 0; m < 8; m++)
-                        {
-                            if(moveSolver.fig_all_moves[n][m] == 1 && check_saving_moves[n][m] == 1) check_saving_figures[i][j] = 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-// fukcja zwraca pola między szachowanym królem a figurą szachującją wraz z polem tej figury
-// Pola które ratują od szacha
 void GameEngine::get_check_saving_moves()
 {   
+    // fukcja zwraca pola między szachowanym królem a figurą szachującją wraz z polem tej figury
+    // Pola które ratują od szacha
     clear_array(check_saving_moves);
     get_checking_figures(board);
 
@@ -338,34 +241,48 @@ void GameEngine::get_check_saving_moves()
 }
 
 
-void GameEngine::change_turn()
-{
-    whites_turn = (whites_turn) ? false : true;
-}
+void GameEngine::get_check_saving_figures()
+{   
+    clear_array(check_saving_figures);
+    get_checking_figures(board);
+    int num_of_checking_figs = sum_array(checking_figures);
+    
+    get_check_saving_moves();
 
-
-void GameEngine::clear_array(std::array<std::array<int, 8>, 8> &myArray)
-{
-    for(int i = 0; i < 8; i++)
+    if(num_of_checking_figs == 1)
     {
-        myArray[i].fill(0);
+        std::array<int,2> checking_cords = get_only_one_cords(checking_figures);
+        for(int i = 0; i < 8; i++)
+        {
+            for(int j = 0; j < 8; j++) //dla kazdej figury gracza otrzymujemy jej ruchy, sprawdzamy czy rych figury jest w ruchach które moga zablokować szacha
+            {
+                if(whites_turn && isupper(board[i][j][0]) && board[i][j][0] != '0' && board[i][j][0] != 'K') // tylko figury biale
+                {
+                    moveSolver.get_all_moves_for_figure(i, j, board);
+                    for(int n = 0; n < 8; n++)
+                    {
+                        for(int m = 0; m < 8; m++)
+                        {
+                            if(moveSolver.fig_all_moves[n][m] == 1 && check_saving_moves[n][m] == 1) check_saving_figures[i][j] = 1;
+                        }
+                    }
+                }
+                if(!whites_turn && islower(board[i][j][0]) && board[i][j][0] != '0' && board[i][j][0] != 'k') // tylko figury czarne
+                {
+                    moveSolver.get_all_moves_for_figure(i, j, board);
+                    for(int n = 0; n < 8; n++)
+                    {
+                        for(int m = 0; m < 8; m++)
+                        {
+                            if(moveSolver.fig_all_moves[n][m] == 1 && check_saving_moves[n][m] == 1) check_saving_figures[i][j] = 1;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
-
-bool GameEngine::check_move_for_check(int row, int col ,int new_row, int new_col) //true jestli ruch skutkuje szachem
-{
-    char fig = board[row][col][0]; // optymalizacja
-    board_cpy = board;
-    board_cpy[new_row][new_col] = fig;
-    board_cpy[row][col] = "0";
-
-    get_checking_figures(board_cpy);
-    int checking_num = sum_array(checking_figures);
-    
-    if(checking_num >= 1) return true;
-    if(checking_num == 0) return false;
-} 
 
 void GameEngine::get_final_moves_for_figure(const int row, const int col)
 {
@@ -416,10 +333,51 @@ void GameEngine::get_final_moves_for_figure(const int row, const int col)
     else if(fig != '0' && tolower(fig) == 'k')
     {
         clear_array(final_moves_for_figure);
-        get_king_allowed_moves2();
+        get_king_allowed_moves();
         final_moves_for_figure = king_allowed_moves;
     }
 }
+
+
+bool GameEngine::check_move_for_check(int row, int col ,int new_row, int new_col) //true jestli ruch skutkuje szachem
+{
+    char fig = board[row][col][0]; // optymalizacja
+    board_cpy = board;
+    board_cpy[new_row][new_col] = fig;
+    board_cpy[row][col] = "0";
+
+    get_checking_figures(board_cpy);
+    int checking_num = sum_array(checking_figures);
+    
+    if(checking_num >= 1) return true;
+    if(checking_num == 0) return false;
+} 
+
+
+void GameEngine::get_king_allowed_moves()
+{
+    clear_array(king_allowed_moves);
+    std::array<int,2> king_pos = get_king_cords(board);
+    
+    moveSolver.get_all_moves_for_figure(king_pos[0], king_pos[1], board);
+    king_allowed_moves = moveSolver.fig_all_moves;
+
+  
+    bool check;
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(king_allowed_moves[i][j] == 1)
+            {
+                check = check_move_for_check(king_pos[0], king_pos[1], i, j);
+                if(check) king_allowed_moves[i][j] = 0;
+            }
+        }
+    }
+    get_castling_moves(board);
+}
+
 
 void GameEngine::get_castling_moves(std::array<std::array<std::string, 8>, 8> &myArray)
 {
@@ -436,6 +394,7 @@ void GameEngine::get_castling_moves(std::array<std::array<std::string, 8>, 8> &m
         king_allowed_moves[king_pos[0]][2] = 1;
     }
 }
+
 
 bool GameEngine::short_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray)
 {
@@ -461,6 +420,7 @@ bool GameEngine::short_castling_condition(int king_row, int king_col, std::array
         return false;
     }
 }
+
 
 bool GameEngine::long_castling_condition(int king_row, int king_col, std::array<std::array<std::string, 8>, 8> &myArray)
 {
@@ -488,10 +448,13 @@ bool GameEngine::long_castling_condition(int king_row, int king_col, std::array<
 }
 
 
-    // for(int i = 0; i < 8; i++)
-    // {
-    //     for(int j = 0; j < 8; j++)
-    //     {
-    // 
-    //     }
-    // }
+bool GameEngine::evaluate_checkmate()
+{
+    // TODO
+}
+
+
+bool GameEngine::evaluate_stalemate()
+{
+    // TODO
+}

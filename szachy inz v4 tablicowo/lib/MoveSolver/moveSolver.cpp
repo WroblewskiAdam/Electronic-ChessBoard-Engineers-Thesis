@@ -51,6 +51,48 @@ void MoveSolver::print_array(const std::array<std::array<int, 8>, 8> &myArray, b
 }
 
 
+bool MoveSolver::in_range(const int &row, const int &col)
+{
+	if (row >= 0 && col >= 0 && row < 8 && col < 8)
+		return true;
+	else
+		return false;
+}
+
+
+int MoveSolver::check_move_type(char moving_figure, char figure_on_possible_pos){ 
+    // funkcja sprawdza rodzaj ruchu na dane pole - wolne  = 0, zajete przez bratnia figure = 1, wroga figura = - 1
+    if (isupper(moving_figure)) //ruch bialego
+    {
+        if (isupper(figure_on_possible_pos)) return 1;// biale na atakowanym polu
+        else if (islower(figure_on_possible_pos)) return -1; // czarne na atakowanym polu
+        else if (figure_on_possible_pos == '0') return 0; //pole wolne
+    }
+    else // ruch czarnego
+    {
+        if (islower(figure_on_possible_pos)) return 1;// czarne na atakowanym polu
+        else if (isupper(figure_on_possible_pos)) return -1; 
+        else if (figure_on_possible_pos == '0') return 0;
+    }
+}
+
+
+void MoveSolver::combine_moves_strikes()
+{
+    clear_array(fig_all_moves);
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(fig_moves[i][j] == 1 || fig_strikes[i][j] == 1) 
+            {
+                fig_all_moves[i][j] = 1;
+            }
+        }   
+    }
+}
+
+
 void MoveSolver::get_pawn_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray)
 {
     std::string moving_figure = myArray[row][col];
@@ -384,44 +426,4 @@ void MoveSolver::get_king_moves(int row, int col, const std::array<std::array<st
     }
 }
 
-
-bool MoveSolver::in_range(const int &row, const int &col)
-{
-	if (row >= 0 && col >= 0 && row < 8 && col < 8)
-		return true;
-	else
-		return false;
-}
-
-
-int MoveSolver::check_move_type(char moving_figure, char figure_on_possible_pos){ 
-    // funkcja sprawdza rodzaj ruchu na dane pole - wolne  = 0, zajete przez bratnia figure = 1, wroga figura = - 1
-    if (isupper(moving_figure)) //ruch bialego
-    {
-        if (isupper(figure_on_possible_pos)) return 1;// biale na atakowanym polu
-        else if (islower(figure_on_possible_pos)) return -1; // czarne na atakowanym polu
-        else if (figure_on_possible_pos == '0') return 0; //pole wolne
-    }
-    else // ruch czarnego
-    {
-        if (islower(figure_on_possible_pos)) return 1;// czarne na atakowanym polu
-        else if (isupper(figure_on_possible_pos)) return -1; 
-        else if (figure_on_possible_pos == '0') return 0;
-    }
-}
-
-void MoveSolver::combine_moves_strikes()
-{
-    clear_array(fig_all_moves);
-    for(int i = 0; i < 8; i++)
-    {
-        for(int j = 0; j < 8; j++)
-        {
-            if(fig_moves[i][j] == 1 || fig_strikes[i][j] == 1) 
-            {
-                fig_all_moves[i][j] = 1;
-            }
-        }   
-    }
-}
 

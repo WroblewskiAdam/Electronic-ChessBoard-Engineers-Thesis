@@ -42,6 +42,9 @@ class MoveSolver
 
         
     
+        
+
+    private:
         void get_pawn_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);
         void get_rook_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);
         void get_knight_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);
@@ -49,8 +52,6 @@ class MoveSolver
         void get_queen_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);
         void get_king_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);
         
-
-    private:
         void clear_array(std::array<std::array<int, 8>, 8> &myArray);
         bool in_range(const int &row, const int &col);
         int check_move_type(char moving_figure, char figure_on_possible_pos);
