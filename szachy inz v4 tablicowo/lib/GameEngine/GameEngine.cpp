@@ -78,18 +78,43 @@ void GameEngine::print_board(const std::array<std::array<std::string, 8>, 8> &my
 
 void GameEngine::print_board(const std::array<std::array<int, 8>, 8> &myArray, bool compact)
 {
-  for(int i = 0; i < 8; i++)
-  {
-    for(int j = 0; j < 8; j++)
+ if(!compact)
     {
-        Serial.print(myArray[i][j]);
-        Serial.print(" ");
-        if(!compact) Serial.print("   ");
+        Serial.println("    0     1     2     3     4     5     6     7");
+        Serial.println("-------------------------------------------------------");
     }
-    if(!compact) Serial.println();
+    for(int i = 0; i < 8; i++)
+    {
+        if(!compact)
+        {
+            Serial.print(i);
+            Serial.print(" | ");
+        }
+
+        for(int j = 0; j < 8; j++)
+        {
+            Serial.print(myArray[i][j]);
+            Serial.print(" ");
+            Serial.print(" ");
+            if(!compact) Serial.print("   ");
+        }
+        if(!compact) 
+        {   
+            Serial.print("|  ");
+            Serial.print(i);
+            Serial.println();
+            Serial.print("  |                                                 |  ");
+        }   
+        Serial.println();
+    }
+
+    if(!compact)
+    {
+        Serial.println("-------------------------------------------------------");
+        Serial.println("    0     1     2     3     4     5     6     7");
+    }
+
     Serial.println();
-  }
-  Serial.println();
 }
 
 
@@ -97,10 +122,27 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
     std::string fig = board[row][col];
     if(fig != "0")
     {
-        board[new_row][new_col] = fig[0];
-        board[row][col] = "0";
+        get_final_moves_for_figure(row, col);
+        if(final_moves_for_figure[new_row][new_col] == 1)
+        {
+            board[new_row][new_col] = fig[0];
+            board[row][col] = "0";
+
+            // flaga do en passant
+            if(fig == "P_" && new_row == 4) 
+                moveSolver.white_en_passant_col = col;
+            if(fig == "p_" && new_row == 3) 
+                moveSolver.black_en_passant_col = col;
+            if(whites_turn && fig != "P" && new_col != moveSolver.black_en_passant_col && moveSolver.black_en_passant_col != -1) 
+                moveSolver.black_en_passant_col = -1; 
+            if(!whites_turn && fig != "p" && new_col != moveSolver.white_en_passant_col && moveSolver.white_en_passant_col != -1) 
+                moveSolver.white_en_passant_col = -1; 
+            
+            change_turn();
+        }
+        else Serial.println("!!!!!!!!!!!! WRONG MOVE !!!!!!!!!!!");
     }
-    change_turn();
+
     // TODO dodac ustawianie flagi do en passant przy ruchu piona
 }
 
@@ -440,26 +482,6 @@ bool GameEngine::long_castling_condition(int &king_row, std::array<std::array<st
         return false;
     }
 }
-
-// bool GameEngine::long_castling_condition(int &king_row, std::array<std::array<std::string, 8>, 8> &myArray)
-// {
-//     if ((myArray[king_row][4] == "K_" || myArray[king_row][4] =="k_") && (myArray[king_row][0] == "R_" || myArray[king_row][0] == "r_")) // wieza i krol nie wykonaly ruchu
-//     {
-//         if(myArray[king_row][1] == "0" && myArray[king_row][2] == "0" && myArray[king_row][3] == "0") // nie ma bierek pomiedzy K a R
-//         {
-//             bool check_1 = check_move_for_check(king_row, 4, king_row, 2); //true jesli szach
-//             bool check_2 = check_move_for_check(king_row, 4, king_row, 3); // true jesli szach
-//             if( !check_1 && !check_2 )
-//             {
-//                 return true;
-//             }
-//         }
-//     }
-//     else
-//     {
-//         return false;
-//     }
-// }
 
 
 bool GameEngine::evaluate_checkmate()

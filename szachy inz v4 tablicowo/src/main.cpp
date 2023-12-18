@@ -174,7 +174,7 @@ void loop() {
       Serial.print(row);
       Serial.print(" col: ");
       Serial.println(col);
-      myGameEngine.print_board(myGameEngine.final_moves_for_figure,1);
+      myGameEngine.print_board(myGameEngine.final_moves_for_figure,0);
 
     }
     act = 0;
