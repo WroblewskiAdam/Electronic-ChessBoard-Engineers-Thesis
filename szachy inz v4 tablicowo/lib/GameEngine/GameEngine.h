@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <string>
 #include <array>
-#include <moveSolver.h>
+#include <MoveSolver.h>
 
 class GameEngine
 {

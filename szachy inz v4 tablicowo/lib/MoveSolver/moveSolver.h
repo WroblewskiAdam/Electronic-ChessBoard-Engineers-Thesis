@@ -11,7 +11,9 @@ class MoveSolver
         void print_array(const std::array<std::array<int, 8>, 8> &myArray, bool compact);
         
         int white_en_passant_col = -1;
+        int white_en_passant_row = -1;
         int black_en_passant_col = -1;
+        int black_en_passant_row = -1;
 
         std::array<std::array<int, 8>, 8> fig_moves = {{{0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0},

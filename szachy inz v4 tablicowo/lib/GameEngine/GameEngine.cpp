@@ -128,22 +128,52 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
             board[new_row][new_col] = fig[0];
             board[row][col] = "0";
 
-            // flaga do en passant
-            if(fig == "P_" && new_row == 4) 
+            // flagi do en passant; black_EP - zbijamy czarnego bialym, white_EP - zbijamy bialego czarnym
+            if(fig == "P_" && new_row == 4)
+            {
+                moveSolver.white_en_passant_row = row - 1;
                 moveSolver.white_en_passant_col = col;
-            if(fig == "p_" && new_row == 3) 
+            }
+            if(fig == "p_" && new_row == 3)
+            {
+                moveSolver.black_en_passant_row = row + 1;
                 moveSolver.black_en_passant_col = col;
+            }
             if(whites_turn && fig != "P" && new_col != moveSolver.black_en_passant_col && moveSolver.black_en_passant_col != -1) 
-                moveSolver.black_en_passant_col = -1; 
+            {
+                moveSolver.black_en_passant_row = -1;
+                moveSolver.black_en_passant_col = -1;
+            }
             if(!whites_turn && fig != "p" && new_col != moveSolver.white_en_passant_col && moveSolver.white_en_passant_col != -1) 
-                moveSolver.white_en_passant_col = -1; 
+            {
+                moveSolver.white_en_passant_row = -1;
+                moveSolver.white_en_passant_col = -1;
+            }
             
+            // bicie przy en passant
+            if(fig == "P") // bialy bije
+            {
+                if(new_col == moveSolver.black_en_passant_col && new_row == moveSolver.black_en_passant_row)
+                {
+                    board[new_row + 1][new_col] = "0";
+                }
+            }
+            if(fig == "p") //czarny bije
+            {
+                if(new_col == moveSolver.white_en_passant_col && new_row == moveSolver.white_en_passant_row)
+                {
+                    Serial.println("DUPA");
+                    board[new_row - 1][new_col] = "0";
+                }
+            }
+
+
             change_turn();
         }
         else Serial.println("!!!!!!!!!!!! WRONG MOVE !!!!!!!!!!!");
-    }
 
-    // TODO dodac ustawianie flagi do en passant przy ruchu piona
+        // TODO - detekcja ruchu en passant i zbicie bierki przeciwnika
+    }
 }
 
 
@@ -460,6 +490,7 @@ bool GameEngine::short_castling_condition(int &king_row, std::array<std::array<s
         return false;
     }
 }
+
 
 bool GameEngine::long_castling_condition(int &king_row, std::array<std::array<std::string, 8>, 8> &myArray)
 {

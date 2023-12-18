@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <detector.h>
-#include <moveSolver.h>
+#include <MoveSolver.h>
 #include <GameEngine.h>
 
 
