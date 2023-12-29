@@ -1,4 +1,4 @@
-#include "detector.h"
+#include "Detector.h"
 
 
 Detector::Detector()

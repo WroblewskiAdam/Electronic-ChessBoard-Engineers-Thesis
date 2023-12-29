@@ -363,6 +363,8 @@ void GameEngine::get_final_moves_for_figure(const int row, const int col)
 {
     // && fig != 'k' && fig != 'K'
     clear_array(final_moves_for_figure);
+    clear_array(final_moves);
+    clear_array(final_strikes);
     char fig = board[row][col][0];
     if(fig != '0' && tolower(fig) != 'k')
     {
@@ -410,6 +412,25 @@ void GameEngine::get_final_moves_for_figure(const int row, const int col)
         clear_array(final_moves_for_figure);
         get_king_allowed_moves();
         final_moves_for_figure = king_allowed_moves;
+    }
+
+    separate_moves_strikes();
+}
+
+
+void GameEngine::separate_moves_strikes()
+{
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if(final_moves_for_figure[i][j] == 1)
+            {
+                char fig = board[i][j][0];
+                if(fig == '0') final_moves[i][j] = 1;
+                else final_strikes[i][j] = 1;
+            }
+        }
     }
 }
 
@@ -573,5 +594,4 @@ bool GameEngine::evaluate_stalemate()
         return true;
     }
     else return false;
-
 }

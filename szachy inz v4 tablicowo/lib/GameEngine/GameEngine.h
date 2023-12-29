@@ -53,6 +53,27 @@ class GameEngine
                                                 {0,0,0,0,0,0,0,0},
                                                 {0,0,0,0,0,0,0,0}}};
 
+        std::array<std::array<int, 8>, 8> final_strikes = {{{0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0}}};
+
+        std::array<std::array<int, 8>, 8> final_moves = {{{0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0},
+                                                {0,0,0,0,0,0,0,0}}};
+
+                                                
+                                                
+
         std::array<std::array<std::string, 8>, 8> board = {{{"0","0","0","0","0","0","0","0"}, // kodaowanie szachowncy male - czarme, duze - biale, dopisek f - figura nie wykonala jeszcze ruchu
                                         {"0","0","0","0","0","0","0","0"},
                                         {"0","0","0","0","0","0","0","0"},
@@ -82,9 +103,9 @@ class GameEngine
         bool evaluate_checkmate();
         bool evaluate_stalemate();
         void get_final_moves_for_figure(const int row, const int col);
+        MoveSolver moveSolver;
 
     private:
-        MoveSolver moveSolver;
         void get_checking_figures(const std::array<std::array<std::string, 8>, 8> &myArray);
         void get_check_saving_moves();
         void get_check_saving_figures();
@@ -100,4 +121,5 @@ class GameEngine
         int sum_array(const std::array<std::array<int, 8>, 8> &myArray);
         void clear_board(std::array<std::array<std::string, 8>, 8> &myArray);
         void clear_array(std::array<std::array<int, 8>, 8> &myArray);
+        void separate_moves_strikes();
 };

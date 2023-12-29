@@ -1,12 +1,14 @@
 #include <Arduino.h>
-#include <detector.h>
+#include <Detector.h>
 #include <MoveSolver.h>
 #include <GameEngine.h>
+#include <Iluminator.h>
 
 
 Detector my_detector;
 MoveSolver my_move_solver;
 GameEngine myGameEngine;
+Iluminator my_iluminator;
 
 // char figures[8][8] = {{'0','0','0','0','0','0','0','0'},
 //                       {'0','0','0','0','0','0','0','0'},
@@ -33,7 +35,7 @@ char figures[8][8] =     {{'r','n','b','q','k','b','n','r'},
                           {'0','0','0','0','0','0','0','0'},
                           {'0','0','0','0','0','0','0','0'},
                           {'0','0','0','0','0','0','0','0'},
-                          {'P','P','P','P','0','P','P','P'},
+                          {'P','P','P','0','0','P','P','P'},
                           {'R','N','B','Q','K','B','N','R'}};
 
 int row = 0;
@@ -137,12 +139,12 @@ void setup() {
   delay(5000);
   Serial.println("Początkowa plansza: ");
   myGameEngine.init_board(figures);
-  // myGameEngine.board[0][0] = "r";
-  // myGameEngine.whites_turn = false;
-  act = 1;  
+  act = 1; 
+  // Iluminator.begin();
 }
 
 void loop() {
+
   if(act == 1)
   {
     Serial.print("plansza ( ruch  ");
@@ -160,6 +162,7 @@ void loop() {
   {
     if (check_vals())
     {
+      my_iluminator.clear();
       unsigned long start = micros();
       myGameEngine.get_final_moves_for_figure(row,col);
       unsigned long end = micros();
@@ -175,6 +178,14 @@ void loop() {
       Serial.print(" col: ");
       Serial.println(col);
       myGameEngine.print_board(myGameEngine.final_moves_for_figure,0);
+      Serial.println("RUCHY: ");
+      myGameEngine.print_board(myGameEngine.final_moves,0);
+      Serial.println("BICIA: ");
+      myGameEngine.print_board(myGameEngine.final_strikes,0);
+      
+
+      my_iluminator.light_moves(myGameEngine.final_moves, 0);
+      my_iluminator.light_moves(myGameEngine.final_strikes, -1);
 
     }
     act = 0;
@@ -185,8 +196,6 @@ void loop() {
     if (check_vals())
     {
       myGameEngine.make_move(row, col, new_row, new_col);
-      // Serial.println("plansza: ");
-      // myGameEngine.print_board(myGameEngine.board,0);
       act = 1;
     }
     else act = 0;
@@ -201,42 +210,8 @@ void loop() {
   }
 
 
-  // Serial.println("1. pozycje figur szachujących: ");
-  // myGameEngine.get_checking_figures(myGameEngine.board);
-  // myGameEngine.print_board(myGameEngine.checking_figures, 1);
-  // // delay(1000);
-  
-  // myGameEngine.get_check_saving_moves();
-  // Serial.println("2. Ruchy save-ujące: ");
-  // myGameEngine.print_board(myGameEngine.check_saving_moves,1);
-  // // delay(1000);
-
-
-  // Serial.println("3. pozycje figur save-ujacych: ");
-  // myGameEngine.get_check_saving_figures();
-  // myGameEngine.print_board(myGameEngine.check_saving_figures, 1);
-  // // delay(1000);
-
-  
-  // myGameEngine.get_king_allowed_moves2();
-  // Serial.println("5. ostateczne ruchy krola: ");
-  // myGameEngine.print_board(myGameEngine.king_allowed_moves,1);
-  // delay(1000);
-
-
-  // // delay(1000);
-  // row = 0;
-  // col = 4;
-  // myGameEngine.get_final_moves_for_figure(row,col);
-  // Serial.print("8. Ostateczne ruchy figury: ");
-  // Serial.println(myGameEngine.board[row][col].c_str());
-  // myGameEngine.print_board(myGameEngine.final_moves_for_figure,1);
-  // delay(2000);
-
-
   recvWithEndMarker();
   showNewData();
 
-  // delay(5000);
 }
 
