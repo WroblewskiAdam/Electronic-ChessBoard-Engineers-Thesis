@@ -14,6 +14,7 @@ int Iluminator::get_pixel_id(int row, int col)
 
 void Iluminator::light(int row, int col, uint32_t color)
 {
+    clear();
     int n = get_pixel_id(row, col);
     pixels.setPixelColor(n, color);
     pixels.show();

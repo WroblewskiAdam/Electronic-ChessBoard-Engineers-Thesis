@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <array>
@@ -21,7 +22,7 @@ class Iluminator
         uint32_t blue = pixels.Color(0, 0, 255);
             
     private:
-        const int pin = 21;
+        const int pin = 26;
         const int pixel_num = 64;
         // Adafruit_NeoPixel *pixels;
         Adafruit_NeoPixel pixels = Adafruit_NeoPixel(pixel_num, pin, NEO_GRB + NEO_KHZ800);

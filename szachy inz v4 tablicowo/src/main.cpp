@@ -3,6 +3,7 @@
 #include <MoveSolver.h>
 #include <GameEngine.h>
 #include <Iluminator.h>
+#include <Wire.h>
 
 
 Detector my_detector;
@@ -135,18 +136,17 @@ void end_game()
 
 void setup() {
   Serial.begin(115200);
-  
   delay(5000);
   Serial.println("Początkowa plansza: ");
   myGameEngine.init_board(figures);
   act = 1; 
-  // Iluminator.begin();
+  my_detector.scan(true);
 }
 
 void loop() {
 
   if(act == 1)
-  {
+  { 
     Serial.print("plansza ( ruch  ");
     if(myGameEngine.whites_turn) Serial.print("białych");
     else Serial.print("czarnych");
@@ -208,10 +208,27 @@ void loop() {
     myGameEngine.print_board(myGameEngine.board,0);
     act = 0;
   }
+  else
+  {
+
+    my_detector.scanBoard();
+    Serial.println("DropDown: ");
+    my_detector.printInt(my_detector.dropDown);
+    Serial.println("Figures: ");
+    my_detector.printChar(my_detector.figures);
+    Serial.print("Wybrana figura: ");
+    Serial.print(my_detector.chosen_fig);
+    Serial.print(" Row: ");
+    Serial.print(my_detector.chosen_row);
+    Serial.print(" Col: ");
+    Serial.println(my_detector.chosen_col);
+    my_iluminator.light(my_detector.chosen_row, my_detector.chosen_col, my_iluminator.red);
+    
+    delay(1000);
+  }
 
 
-  recvWithEndMarker();
-  showNewData();
-
+  // recvWithEndMarker();
+  // showNewData();
 }
 

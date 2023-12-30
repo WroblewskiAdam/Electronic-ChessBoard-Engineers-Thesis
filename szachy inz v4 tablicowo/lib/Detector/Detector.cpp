@@ -3,7 +3,14 @@
 
 Detector::Detector()
 {
-  
+  pinMode(s0, OUTPUT);
+  pinMode(s1, OUTPUT);
+  pinMode(s2, OUTPUT);
+  pinMode(s3, OUTPUT);
+  pinMode(sig1, INPUT);
+  pinMode(sig2, INPUT);
+  pinMode(sig3, INPUT);
+  pinMode(sig4, INPUT);
 }
 
 
@@ -21,9 +28,10 @@ void Detector::scan(bool reference)
   reading_num = 10;
   if (reference){
     Serial.println("Obtainig reference values");
-    reading_num = 1000;
+    reading_num = 100;
   }
 
+  clear_array(rawValues);
   for (int k = 0; k < reading_num; k++)
   {
     if (reference){Serial.print("Reading "); Serial.println(k);}
@@ -65,6 +73,12 @@ void Detector::scan(bool reference)
       }
     } 
   }
+
+  // Serial.println("REFERENCE: ");
+  // printInt(referenceValues);
+  // Serial.println("Raw: ");
+  // printInt(rawValues);
+
 }
 
 
@@ -72,6 +86,7 @@ void Detector::scan(bool reference)
 
 void Detector::mapToFigure()
 {
+  prev_figures = figures;
   clearFigArray(figures);
   for(int i = 0; i < 8; i++)
   {
@@ -91,23 +106,24 @@ void Detector::mapToFigure()
       //   { figures[i][j] = 'K';} //2,5 - K
       
       if      (dropDown[i][j] > calibration[0][i][j] - 40)
-        { figures[i][j] = 1;} //0 - P
+        { figures[i][j] = '1';} //0 - P
       else if (dropDown[i][j] < calibration[1][i][j] + 30 && dropDown[i][j] > calibration[1][i][j]-50)  
-        { figures[i][j] = 2;} //0,5 - W
+        { figures[i][j] = '2';} //0,5 - W
       else if (dropDown[i][j] < calibration[2][i][j] + 100 && dropDown[i][j] > calibration[2][i][j]-100)  
-        { figures[i][j] = 3;} //1 - S
+        { figures[i][j] = '3';} //1 - S
       else if (dropDown[i][j] < calibration[3][i][j] + 60 && dropDown[i][j] > calibration[3][i][j]-60)  
-        { figures[i][j] = 4;} //1,5 - G
+        { figures[i][j] = '4';} //1,5 - G
       else if (dropDown[i][j] < calibration[4][i][j] + 50 && dropDown[i][j] > calibration[4][i][j]-30)  
-        { figures[i][j] = 5;} //2 - Q
+        { figures[i][j] = '5';} //2 - Q
       else if (dropDown[i][j] < calibration[5][i][j] + 30 && dropDown[i][j] > calibration[5][i][j]-100)  
-        { figures[i][j] = 6;} //2,5 - K
+        { figures[i][j] = '6';} //2,5 - K
 
     }
   }
 }
 
-void Detector::clearFigArray(char myArray[][8])
+
+void Detector::clearFigArray(std::array<std::array<char, 8>, 8> &myArray)
 {
   for(int i = 0; i < 8; i++)
   {
@@ -131,7 +147,7 @@ void Detector::getDropDown()
 }
 
 
-void Detector::displayFigData(const char myArray[][8])
+void Detector::printChar(const std::array<std::array<char, 8>, 8> &myArray)
 {
   Serial.println();
   for(int i = 0; i < 8; i++)
@@ -145,13 +161,14 @@ void Detector::displayFigData(const char myArray[][8])
       Serial.print(myArray[i][j]);
       Serial.print(" ");
     }
-    Serial.println();
+    // Serial.println();
     Serial.println();
   }
 }
 
 
-void Detector::displayIntData(const int myArray[][8])
+
+void Detector::printInt(const std::array<std::array<int, 8>, 8> &myArray)
 {
   Serial.println();
   for(int i = 0; i < 8; i++)
@@ -165,15 +182,47 @@ void Detector::displayIntData(const int myArray[][8])
       Serial.print(myArray[i][j]);
       Serial.print(" ");
     }
-    Serial.println();
+    // Serial.println();
     Serial.println();
   }
 }
 
+
+void Detector::getChosenFigure()
+{
+  for(int i = 0; i < 8; i++)
+  {
+    for(int j = 0; j < 8; j++)
+    {
+      if ((figures[i][j] != prev_figures[i][j]) && figures[i][j] == '0')
+      {
+        chosen_fig = prev_figures[i][j];
+        chosen_row = i;
+        chosen_col = j;
+      }
+    }
+  }
+}
+
+
+void Detector::clear_array(std::array<std::array<int, 8>, 8> &myArray)
+{
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            myArray[i][j] = 0;
+        }
+    }
+}
 
 void Detector::scanBoard()
 {
   scan(false);
   getDropDown();
   mapToFigure();
+
+  // chosen_row = NULL;
+  // chosen_col = NULL;
+  getChosenFigure();
 }
