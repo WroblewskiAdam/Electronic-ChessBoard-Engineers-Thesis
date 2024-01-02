@@ -4,12 +4,14 @@
 #include <GameEngine.h>
 #include <Iluminator.h>
 #include <Wire.h>
+// #include <Display.h>
 
 
 Detector my_detector;
 MoveSolver my_move_solver;
 GameEngine myGameEngine;
 Iluminator my_iluminator;
+// Display my_display;
 
 // char figures[8][8] = {{'0','0','0','0','0','0','0','0'},
 //                       {'0','0','0','0','0','0','0','0'},
@@ -212,19 +214,20 @@ void loop() {
   {
 
     my_detector.scanBoard();
-    Serial.println("DropDown: ");
-    my_detector.printInt(my_detector.dropDown);
-    Serial.println("Figures: ");
-    my_detector.printChar(my_detector.figures);
-    Serial.print("Wybrana figura: ");
-    Serial.print(my_detector.chosen_fig);
-    Serial.print(" Row: ");
-    Serial.print(my_detector.chosen_row);
-    Serial.print(" Col: ");
-    Serial.println(my_detector.chosen_col);
-    my_iluminator.light(my_detector.chosen_row, my_detector.chosen_col, my_iluminator.red);
-    
-    delay(1000);
+    // Serial.println("DropDown: ");
+    // my_detector.printInt(my_detector.dropDown);
+    // Serial.println("Figures: ");
+    // my_detector.printChar(my_detector.figures);
+    // Serial.print("Wybrana figura: ");
+    // Serial.print(my_detector.chosen_fig);
+    // Serial.print(" Row: ");
+    // Serial.print(my_detector.chosen_row);
+    // Serial.print(" Col: ");
+    // Serial.println(my_detector.chosen_col);
+    // if(my_detector.fig_picked == true) my_iluminator.light(my_detector.chosen_row, my_detector.chosen_col, my_iluminator.red);
+    // else my_iluminator.clear();
+
+    // delay(1000);
   }
 
 

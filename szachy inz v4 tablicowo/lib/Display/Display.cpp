@@ -7,7 +7,6 @@ Display::Display()
   lcd.backlight();
 }
 
-
 void Display::scrollText(int row, String &message, int delayTime, int lcdColumns) {
   for (int i=0; i < lcdColumns; i++) 
   {

@@ -2,9 +2,8 @@
 
 Iluminator::Iluminator(){
     pixels.begin();
-    // pixels.show();
-    // pixels.setBrightness(255);
 }
+
 
 int Iluminator::get_pixel_id(int row, int col)
 {
@@ -12,18 +11,25 @@ int Iluminator::get_pixel_id(int row, int col)
     return n;
 }
 
+
 void Iluminator::light(int row, int col, uint32_t color)
 {
     clear();
     int n = get_pixel_id(row, col);
     pixels.setPixelColor(n, color);
     pixels.show();
+    is_dark = false;
 }
 
+
 void Iluminator::clear()
-{
-    pixels.clear();
-    pixels.show();
+{   
+    if(!is_dark)
+    {
+        pixels.clear();
+        pixels.show();
+        is_dark = true;
+    }
 }
 
 
@@ -40,18 +46,22 @@ void Iluminator::light_moves(const std::array<std::array<int, 8>, 8> &myArray, i
            if(myArray[i][j] == 1) light(i, j, color);
         }
     }
+    is_dark = false;
 }
+
 
 void Iluminator::light_all_sequence(uint32_t my_color)
 {
-  pixels.clear();
-  for(int i = 0; i < 64; i++)
-  {
-    pixels.setPixelColor(i,my_color);
-    pixels.show();
-    delay(50);
-  }
+    pixels.clear();
+    for(int i = 0; i < 64; i++)
+    {
+        pixels.setPixelColor(i,my_color);
+        pixels.show();
+        delay(50);
+    }
+    is_dark = false;
 }
+
 
 void Iluminator::start_animation()
 {

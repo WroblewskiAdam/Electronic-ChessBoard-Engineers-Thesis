@@ -19,7 +19,9 @@ class Detector
         void scanBoard();
         void printChar(const std::array<std::array<char, 8>, 8> &myArray);
         void printInt(const std::array<std::array<int, 8>, 8> &myArray);
-        void getChosenFigure();
+        void getPickedFigure();
+        void getPlacedFigure();
+        void getMove();
         void clear_array(std::array<std::array<int, 8>, 8> &myArray);
 
     // private:
@@ -28,11 +30,29 @@ class Detector
         void mapToFigure();
         void getDropDown();
         void scan(bool reference);
-        int reading_num = 10;
+        void check_for_place_back();
+        bool board_change();
+        void check_for_move();
+        int reading_num = 100;
 
-        int chosen_row = NULL;
-        int chosen_col = NULL;
-        char chosen_fig = NULL;
+        // int chosen_row = -1;
+        // int chosen_col = -1;
+        char picked_fig = 'X';
+        bool is_fig_picked = false;
+        int picked_row = -1;
+        int picked_col = -1;
+        
+        bool move = false;
+        int new_row = -1;
+        int new_col = -1;
+
+        bool change = true;
+        int change_row = -1;
+        int change_col = -1;
+
+        int change_count = 0;
+
+        bool got_prev_board = false;
 
         std::array<std::array<int, 8>, 8> referenceValues =   {{{0,0,0,0,0,0,0,0}, // potrzebne do obliczania dropdownu 
                                                                 {0,0,0,0,0,0,0,0},
@@ -72,6 +92,15 @@ class Detector
                                                         {'0','0','0','0','0','0','0','0'}}};
 
         std::array<std::array<char, 8>, 8> prev_figures = {{{'0','0','0','0','0','0','0','0'},
+                                                            {'0','0','0','0','0','0','0','0'},
+                                                            {'0','0','0','0','0','0','0','0'},
+                                                            {'0','0','0','0','0','0','0','0'},
+                                                            {'0','0','0','0','0','0','0','0'},
+                                                            {'0','0','0','0','0','0','0','0'},
+                                                            {'0','0','0','0','0','0','0','0'},
+                                                            {'0','0','0','0','0','0','0','0'}}};
+                                                            
+        std::array<std::array<char, 8>, 8> fig_before_change = {{{'0','0','0','0','0','0','0','0'},
                                                             {'0','0','0','0','0','0','0','0'},
                                                             {'0','0','0','0','0','0','0','0'},
                                                             {'0','0','0','0','0','0','0','0'},
