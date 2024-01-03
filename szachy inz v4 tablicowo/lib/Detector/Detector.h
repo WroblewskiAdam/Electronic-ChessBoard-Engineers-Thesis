@@ -19,9 +19,7 @@ class Detector
         void scanBoard();
         void printChar(const std::array<std::array<char, 8>, 8> &myArray);
         void printInt(const std::array<std::array<int, 8>, 8> &myArray);
-        void getPickedFigure();
-        void getPlacedFigure();
-        void getMove();
+
         void clear_array(std::array<std::array<int, 8>, 8> &myArray);
 
     // private:
@@ -30,29 +28,29 @@ class Detector
         void mapToFigure();
         void getDropDown();
         void scan(bool reference);
-        void check_for_place_back();
-        bool board_change();
-        void check_for_move();
-        int reading_num = 100;
-
-        // int chosen_row = -1;
-        // int chosen_col = -1;
-        char picked_fig = 'X';
-        bool is_fig_picked = false;
-        int picked_row = -1;
-        int picked_col = -1;
         
-        bool move = false;
-        int new_row = -1;
-        int new_col = -1;
+        bool detect_board_change();
 
-        bool change = true;
+        void check_for_picked_fig();
+        void check_for_placed_back();
+        void check_for_move();
+        void check_for_new_fig();
+        
+        int reading_num = 50;
+
         int change_row = -1;
         int change_col = -1;
 
-        int change_count = 0;
+        bool is_fig_picked = false;
+        char picked_fig = 'X';
+        int picked_row = -1;
+        int picked_col = -1;
 
-        bool got_prev_board = false;
+        int new_row = -1;
+        int new_col = -1;
+
+
+        int iter = 0;
 
         std::array<std::array<int, 8>, 8> referenceValues =   {{{0,0,0,0,0,0,0,0}, // potrzebne do obliczania dropdownu 
                                                                 {0,0,0,0,0,0,0,0},

@@ -25,7 +25,7 @@ void Detector::choosePin(int pin)
 
 void Detector::scan(bool reference)
 {   
-  reading_num = 100;
+  reading_num = 50;
   if (reference){
     Serial.println("Obtainig reference values");
     reading_num = 1000;
@@ -189,7 +189,7 @@ void Detector::clear_array(std::array<std::array<int, 8>, 8> &myArray)
 }
 
 
-bool Detector::board_change()
+bool Detector::detect_board_change()
 {
   for(int i = 0; i < 8; i++)
   {
@@ -207,18 +207,16 @@ bool Detector::board_change()
 }
 
 
-void Detector::getPickedFigure()
+void Detector::check_for_picked_fig()
 {
   if(change_row != -1 && change_col != -1)
   {  
-    if(figures[change_row][change_col] == '0')
+    if(figures[change_row][change_col] == '0' && fig_before_change[change_row][change_col] != '0' && is_fig_picked == false)
     {
-      is_fig_picked = true;
       picked_fig = fig_before_change[change_row][change_col];
+      is_fig_picked = true;
       picked_row = change_row;
       picked_col = change_col;
-
-
 
       Serial.print("2 Podniesiono: ");
       Serial.print("row: ");
@@ -227,77 +225,74 @@ void Detector::getPickedFigure()
       Serial.print(picked_col);
       Serial.print(" fig: ");
       Serial.println(picked_fig);
-      got_prev_board = false;
     }
   }
 }
 
-
-void Detector::getPlacedFigure()
+void Detector::check_for_placed_back()
 {
   if(change_row != -1 && change_col != -1)
   {  
-    if(fig_before_change[change_row][change_col] == '0' && figures[change_row][change_col] != '0')
+    // Serial.println("########## PlaceBACK ########");
+    // Serial.print("Change row: ");
+    // Serial.print(change_row);
+    // Serial.print(" col: ");
+    // Serial.println(change_col);
+    // Serial.print("Picked row: ");
+    // Serial.print(picked_row);
+    // Serial.print(" col: ");
+    // Serial.println(picked_col);
+    // Serial.println(" Figs_before: ");
+    // printChar(fig_before_change);
+    // Serial.println(" Figs: ");
+    // printChar(figures);
+
+    if(figures[change_row][change_col] != '0' && fig_before_change[change_row][change_col] == '0' 
+    && figures[change_row][change_col] == picked_fig && is_fig_picked == true 
+    && picked_row == change_row && picked_col == change_col)
     {
-      Serial.print("1 Postawiono: ");
-      Serial.print("row: ");
-      Serial.print(change_row);
-      Serial.print(" col: ");
-      Serial.print(change_col);
-      Serial.print(" fig: ");
-      Serial.println(picked_fig);
-
-      new_row = change_row;
-      new_col = change_col;
-      
-      got_prev_board = false;
-    }
-  }
-}
-
-
-
-
-void Detector::check_for_place_back()
-{
-  if(change_row != -1 && change_col != -1)
-  {
-    // if(figures[change_row][change_col] == picked_fig && is_fig_picked == true)
-    if(change_row == picked_row && change_col == picked_col && is_fig_picked == true)
-    {
-      Serial.println("placeback");
-      picked_col = -1;
-      picked_row = -1;
-      picked_fig = 'X';
+      Serial.println("Wracasz na swoje miejsce");
       is_fig_picked = false;
+      picked_row = -1;
+      picked_col = -1;
     }
   }
 }
-
 
 void Detector::check_for_move()
 {
   if(change_row != -1 && change_col != -1)
-  {
-    if(figures[change_row][change_col] == picked_fig && change_row != picked_row && change_col != picked_col && is_fig_picked == true)
+  {  
+    // Serial.println("########## MOVE ########");
+    // Serial.print("Change row: ");
+    // Serial.print(change_row);
+    // Serial.print(" col: ");
+    // Serial.println(change_col);
+    // Serial.print("Picked row: ");
+    // Serial.print(picked_row);
+    // Serial.print(" col: ");
+    // Serial.println(picked_col);
+    // Serial.println(" Figs_before: ");
+    // printChar(fig_before_change);
+    // Serial.println(" Figs: ");
+    // printChar(figures);
+
+    if(figures[change_row][change_col] != '0' && fig_before_change[change_row][change_col] == '0' 
+    && figures[change_row][change_col] == picked_fig && is_fig_picked == true 
+    && (picked_row != change_row || picked_col != change_col))
     {
-      new_row = change_row;
-      new_col = change_col;
-      move = true;
-      Serial.print("Ruch z: ");
+      Serial.print("Ło ty kurwa spierdala   ");
+      Serial.print(" z: ");
       Serial.print(picked_row);
-      Serial.print(" , ");
+      Serial.print(",");
       Serial.print(picked_col);
-      Serial.print("  na  ");
-      Serial.print(new_row);
-      Serial.print(" , ");
-      Serial.println(new_col);
-
-
+      Serial.print(" na: ");
+      Serial.print(change_row);
+      Serial.print(",");
+      Serial.println(change_col);
+      is_fig_picked = false;
       picked_row = -1;
       picked_col = -1;
-      picked_fig = 'X';
-      is_fig_picked = false;
     }
   }
 }
@@ -309,43 +304,34 @@ void Detector::scanBoard()
   scan(false);
   getDropDown();
   mapToFigure();
- 
-  bool change = board_change();
+  bool change = detect_board_change();
+  
+
   if(change)
   {
-    change_count++;
-    // Serial.println();
-    // Serial.print("#### ZMIANA-");
-    // Serial.print(change_count);
-    // Serial.print(" na ");
-    // Serial.print(change_row);
-    // Serial.print("|");
-    // Serial.println(change_col);
-
-    if(!got_prev_board)
-    {
-      // Serial.println("!!!!!!!! Saved figures before !!!!!!");
-      fig_before_change = prev_figures;
-      got_prev_board = true;
-    }
-
-    // Serial.println("Fig_before change: ");
+    fig_before_change = prev_figures; // zapamiętanie planszy przed zmianą
+    Serial.println();
+    Serial.println("Sonduje mnie stara kurwa");
     // printChar(fig_before_change);
-    
-    getPlacedFigure();
-    getPickedFigure();
-
-    if(new_col == picked_row && new_row == picked_row && is_fig_picked)
-    {
-      is_fig_picked = false;
-      move = false;
-      Serial.println(" Wróciałaś szmato");
-    }
-    else if(new_row != picked_row && new_col != picked_col && is_fig_picked)
-    {
-      Serial.println(" Gdzie spierdalasz");
-      move = true;
-      is_fig_picked = false;
-    }
   }
+
+  while(change) // przeczekanie okresu niestabilnego
+  {
+    // Serial.print("DUPA zmiana ");
+    // Serial.println(iter);
+
+    prev_figures = figures;
+    scan(false);
+    getDropDown();
+    mapToFigure();
+    change = detect_board_change();
+    iter++;
+  }
+  
+  // check_for_new_fig();
+  check_for_picked_fig();
+  check_for_placed_back();
+  check_for_move();
+  
+  
 }
