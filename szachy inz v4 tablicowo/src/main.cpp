@@ -119,9 +119,17 @@ void setup() {
 
 
 void loop() {
+    // unsigned long start = micros();
+    
+    
     my_detector.scan(false);
     my_detector.getDropDown();
+    // unsigned long end = micros();
+    // unsigned long delta = end - start;
     my_detector.printInt(my_detector.dropDown);
+    // Serial.print("Execution time: ");
+    // Serial.print(delta);
+    // Serial.println(" microSeconds");
 
 
     // switch (state)
