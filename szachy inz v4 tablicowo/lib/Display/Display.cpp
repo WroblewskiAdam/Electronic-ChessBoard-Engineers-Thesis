@@ -23,7 +23,7 @@ void Display::scrollText(int row, String &message, int delayTime, int lcdColumns
 
 void Display::print(int row, String &message)
 {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(message);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(message);
 }

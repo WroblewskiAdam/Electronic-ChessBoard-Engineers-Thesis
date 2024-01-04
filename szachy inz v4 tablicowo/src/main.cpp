@@ -3,8 +3,9 @@
 #include <MoveSolver.h>
 #include <GameEngine.h>
 #include <Iluminator.h>
-#include <Wire.h>
 // #include <Display.h>
+// #include <LiquidCrystal_I2C.h>
+
 
 
 Detector my_detector;
@@ -41,13 +42,7 @@ char figures[8][8] =     {{'r','n','b','q','k','b','n','r'},
                           {'P','P','P','0','0','P','P','P'},
                           {'R','N','B','Q','K','B','N','R'}};
 
-int row = 0;
-int col = 0;
-int new_row = 0;
-int new_col = 0;
-
-int act = 0;
-std::array<int,2> cords;
+int state = 0;
 
 const byte numChars = 32;
 char receivedChars[numChars];
@@ -85,37 +80,11 @@ void showNewData() {
     myStr = receivedChars;
     Serial.println(myStr.c_str());
     
-    row = receivedChars[1] - '0';
-    col = receivedChars[2] - '0';
-    new_row = receivedChars[3] - '0';
-    new_col = receivedChars[4] - '0';
-    act = receivedChars[0] - '0';
-
-    if (new_row < 0) new_row = 0;
-    if (new_col < 0) new_col = 0;
-    Serial.print("act: ");
-    Serial.print(act);
-    Serial.print(" row: ");
-    Serial.print(row);
-    Serial.print(" col: ");
-    Serial.print(col);
-    Serial.print(" new_row: ");
-    Serial.print(new_row);
-    Serial.print(" new_col: ");
-    Serial.println(new_col);
-
-
+    state = receivedChars[0] - '0';
   }
 }
 
-bool check_vals()
-{
-  if(row >=0 && row <=7 && col >=0 && col <=7 && new_row >=0 && new_row <=7 && new_col >=0 && new_col <=7)
-  {
-    return true;
-  }
-  else return false;
-}
+
 
 void end_game()
 {
@@ -136,102 +105,157 @@ void end_game()
 }
 
 
+
+
 void setup() {
-  Serial.begin(115200);
-  delay(5000);
-  Serial.println("Początkowa plansza: ");
-  myGameEngine.init_board(figures);
-  act = 1; 
-  my_detector.scan(true);
+    Serial.begin(115200);
+    // lcd.init();
+    // lcd.backlight();
+    // lcd.setCursor(0,0);
+    // lcd.print("Inicjalizacja");
+    my_detector.scan(true);
+    state = 1; 
 }
 
-void loop() {
 
-  if(act == 1)
-  { 
-    Serial.print("plansza ( ruch  ");
-    if(myGameEngine.whites_turn) Serial.print("białych");
-    else Serial.print("czarnych");
-    Serial.println("  ):");
-    end_game();
+void loop() {
+    my_detector.scan(false);
+    my_detector.getDropDown();
+    my_detector.printInt(my_detector.dropDown);
+
+
+    // switch (state)
+    // {
+    //     case 1:
+    //         Serial.println("Stan 1");
+    //         // lcd.clear();
+    //         // lcd.print("Stan 1");
+    //         // display...
+
+    //         state = 0;
+    //         break;
+        
+    //     case 2:
+    //         Serial.println("Stan 2");
+    //         Serial.println("Init");
+    //         // lcd.clear();
+    //         // lcd.print("Stan 2");
+            
+    //         myGameEngine.init_board(figures);
+            
+    //         Serial.print("plansza ( ruch  ");
+    //         if(myGameEngine.whites_turn) Serial.print("białych");
+    //         else Serial.print("czarnych");
+    //         Serial.println("  ):");
+    //         myGameEngine.print_board(myGameEngine.board,0);
+            
+    //         state = 0;
+
+    //         break;
+
+    //     case 3:
+    //         Serial.println("Stan 3");
+    //         Serial.println("Scan");
+    //         state = 4;
+    //         break;
+
+    //     case 4:
+    //         my_detector.scanBoard();
+    //         break;
+
+    //     default:
+    //         break;
+    // }
+
+    // recvWithEndMarker();
+    // showNewData();
+
+
+
+
+
+//   if(act == 1)
+//   { 
+//     Serial.print("plansza ( ruch  ");
+//     if(myGameEngine.whites_turn) Serial.print("białych");
+//     else Serial.print("czarnych");
+//     Serial.println("  ):");
+//     end_game();
     
 
-    myGameEngine.print_board(myGameEngine.board,0);
+//     myGameEngine.print_board(myGameEngine.board,0);
 
-    act = 0;
-  }
-  else if(act == 2)
-  {
-    if (check_vals())
-    {
-      my_iluminator.clear();
-      unsigned long start = micros();
-      myGameEngine.get_final_moves_for_figure(row,col);
-      unsigned long end = micros();
-      unsigned long delta = end - start;
-      Serial.print("Execution time: ");
-      Serial.print(delta);
-      Serial.println(" microSeconds");
+//     act = 0;
+//   }
+//   else if(act == 2)
+//   {
+//     if (check_vals())
+//     {
+//       my_iluminator.clear();
+//       unsigned long start = micros();
+//       myGameEngine.get_final_moves_for_figure(row,col);
+//       unsigned long end = micros();
+//       unsigned long delta = end - start;
+//       Serial.print("Execution time: ");
+//       Serial.print(delta);
+//       Serial.println(" microSeconds");
 
-      Serial.print("Ostateczne ruchy figury: ");
-      Serial.print(myGameEngine.board[row][col].c_str());
-      Serial.print(" row: ");
-      Serial.print(row);
-      Serial.print(" col: ");
-      Serial.println(col);
-      myGameEngine.print_board(myGameEngine.final_moves_for_figure,0);
-      Serial.println("RUCHY: ");
-      myGameEngine.print_board(myGameEngine.final_moves,0);
-      Serial.println("BICIA: ");
-      myGameEngine.print_board(myGameEngine.final_strikes,0);
+//       Serial.print("Ostateczne ruchy figury: ");
+//       Serial.print(myGameEngine.board[row][col].c_str());
+//       Serial.print(" row: ");
+//       Serial.print(row);
+//       Serial.print(" col: ");
+//       Serial.println(col);
+//       myGameEngine.print_board(myGameEngine.final_moves_for_figure,0);
+//       Serial.println("RUCHY: ");
+//       myGameEngine.print_board(myGameEngine.final_moves,0);
+//       Serial.println("BICIA: ");
+//       myGameEngine.print_board(myGameEngine.final_strikes,0);
       
 
-      my_iluminator.light_moves(myGameEngine.final_moves, 0);
-      my_iluminator.light_moves(myGameEngine.final_strikes, -1);
+//       my_iluminator.light_moves(myGameEngine.final_moves, 0);
+//       my_iluminator.light_moves(myGameEngine.final_strikes, -1);
 
-    }
-    act = 0;
-  }
+//     }
+//     act = 0;
+//   }
   
-  else if(act == 3)
-  {
-    if (check_vals())
-    {
-      myGameEngine.make_move(row, col, new_row, new_col);
-      act = 1;
-    }
-    else act = 0;
-  }
+//   else if(act == 3)
+//   {
+//     if (check_vals())
+//     {
+//       myGameEngine.make_move(row, col, new_row, new_col);
+//       act = 1;
+//     }
+//     else act = 0;
+//   }
 
-  else if(act == 4)
-  {
-    Serial.println("Początkowa plansza: ");
-    myGameEngine.init_board(figures_full);
-    myGameEngine.print_board(myGameEngine.board,0);
-    act = 0;
-  }
-  else
-  {
+//   else if(act == 4)
+//   {
+//     Serial.println("Początkowa plansza: ");
+//     myGameEngine.init_board(figures_full);
+//     myGameEngine.print_board(myGameEngine.board,0);
+//     act = 0;
+//   }
+//   else
+//   {
+//     my_detector.scanBoard();
+//     // Serial.println("DropDown: ");
+//     // my_detector.printInt(my_detector.dropDown);
+//     // Serial.println("Figures: ");
+//     // my_detector.printChar(my_detector.figures);
+//     // Serial.print("Wybrana figura: ");
+//     // Serial.print(my_detector.chosen_fig);
+//     // Serial.print(" Row: ");
+//     // Serial.print(my_detector.chosen_row);
+//     // Serial.print(" Col: ");
+//     // Serial.println(my_detector.chosen_col);
+//     // if(my_detector.fig_picked == true) my_iluminator.light(my_detector.chosen_row, my_detector.chosen_col, my_iluminator.red);
+//     // else my_iluminator.clear();
 
-    my_detector.scanBoard();
-    // Serial.println("DropDown: ");
-    // my_detector.printInt(my_detector.dropDown);
-    // Serial.println("Figures: ");
-    // my_detector.printChar(my_detector.figures);
-    // Serial.print("Wybrana figura: ");
-    // Serial.print(my_detector.chosen_fig);
-    // Serial.print(" Row: ");
-    // Serial.print(my_detector.chosen_row);
-    // Serial.print(" Col: ");
-    // Serial.println(my_detector.chosen_col);
-    // if(my_detector.fig_picked == true) my_iluminator.light(my_detector.chosen_row, my_detector.chosen_col, my_iluminator.red);
-    // else my_iluminator.clear();
-
-    // delay(1000);
-  }
+//     // delay(1000);
+//   }
 
 
-  // recvWithEndMarker();
-  // showNewData();
 }
 

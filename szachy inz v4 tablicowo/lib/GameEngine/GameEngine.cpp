@@ -23,6 +23,14 @@ void GameEngine::init_board(const char (&myArray)[8][8]){
 }
 
 
+void GameEngine::init_fig(int row, int col, char fig){
+    whites_turn = true;
+    std::string fig_cod(1, fig);
+    if(fig != '0') fig_cod.append(1,'_');
+    board[row][col] = fig_cod;
+}
+
+
 void GameEngine::clear_board(std::array<std::array<std::string, 8>, 8> &myArray){
     for(int i = 0; i < 8; i++)
     {

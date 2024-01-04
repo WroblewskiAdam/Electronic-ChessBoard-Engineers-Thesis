@@ -96,6 +96,7 @@ class GameEngine
         
         GameEngine();
         void init_board(const char (&myArray)[8][8]);
+        void init_fig(int row, int col, char fig);
         void print_board(const std::array<std::array<std::string, 8>, 8> &myArray, bool compact);
         void print_board(const std::array<std::array<int, 8>, 8> &myArray, bool compact);
         void change_turn();

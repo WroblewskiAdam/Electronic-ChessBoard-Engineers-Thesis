@@ -25,7 +25,7 @@ void Detector::choosePin(int pin)
 
 void Detector::scan(bool reference)
 {   
-  reading_num = 50;
+  reading_num = 200;
   if (reference){
     Serial.println("Obtainig reference values");
     reading_num = 1000;
@@ -34,7 +34,8 @@ void Detector::scan(bool reference)
   clear_array(rawValues);
   for (int k = 0; k < reading_num; k++)
   {
-    if (reference){Serial.print("Reading "); Serial.println(k);}
+    iter++;
+    if (reference){Serial.print("Reading "); Serial.println(iter);}
     for (int i = 0; i < 16; i++) // 16 pins on mux
     {
       choosePin(i); // choose an input pin on the 74HC4067 MUX
@@ -51,7 +52,8 @@ void Detector::scan(bool reference)
         rawValues[7][i-8]= rawValues[7][i-8] + analogRead(sig4); // 4.2
       }
     }
-    if (reference){delay(10);}
+    if(reference) delay(10);
+    else delay(10);
   }
     
   for(int i = 0; i < 8; i++)
@@ -213,20 +215,20 @@ void Detector::check_for_picked_fig()
   {  
     if(figures[change_row][change_col] == '0' && fig_before_change[change_row][change_col] != '0' && is_fig_picked == false)
     {
-      picked_fig = fig_before_change[change_row][change_col];
-      is_fig_picked = true;
-      picked_row = change_row;
-      picked_col = change_col;
+        picked_fig = fig_before_change[change_row][change_col];
+        is_fig_picked = true;
+        picked_row = change_row;
+        picked_col = change_col;
 
-      Serial.print("2 Podniesiono: ");
-      Serial.print("row: ");
-      Serial.print(picked_row);
-      Serial.print(" col: ");
-      Serial.print(picked_col);
-      Serial.print(" fig: ");
-      Serial.println(picked_fig);
+        Serial.print("2 Podniesiono: ");
+        Serial.print("row: ");
+        Serial.print(picked_row);
+        Serial.print(" col: ");
+        Serial.print(picked_col);
+        Serial.print(" fig: ");
+        Serial.println(picked_fig);
+        }
     }
-  }
 }
 
 void Detector::check_for_placed_back()
@@ -297,41 +299,66 @@ void Detector::check_for_move()
   }
 }
 
+void Detector::check_for_new_fig()
+{
+    if(change_row != -1 && change_col != -1)
+    {  
+    // Serial.println("########## MOVE ########");
+    // Serial.print("Change row: ");
+    // Serial.print(change_row);
+    // Serial.print(" col: ");
+    // Serial.println(change_col);
+    // Serial.print("Picked row: ");
+    // Serial.print(picked_row);
+    // Serial.print(" col: ");
+    // Serial.println(picked_col);
+    // Serial.println(" Figs_before: ");
+    // printChar(fig_before_change);
+    // Serial.println(" Figs: ");
+    // printChar(figures);
+
+        if(figures[change_row][change_col] != '0' && fig_before_change[change_row][change_col] == '0' && is_fig_picked == false)
+        {
+            Serial.print("Nowy szon na rejonie");
+            Serial.print(" na: ");
+            Serial.print(change_row);
+            Serial.print(",");
+            Serial.println(change_col);
+
+            is_fig_picked = false;
+            picked_row = -1;
+            picked_col = -1;
+        }
+    }
+}
 
 void Detector::scanBoard()
 {
-  prev_figures = figures;
-  scan(false);
-  getDropDown();
-  mapToFigure();
-  bool change = detect_board_change();
-  
+    prev_figures = figures;
+    scan(false);
+    getDropDown();
+    mapToFigure();
+    bool change = detect_board_change();
 
-  if(change)
-  {
+    if(change)
+    {
     fig_before_change = prev_figures; // zapamiętanie planszy przed zmianą
     Serial.println();
     Serial.println("Sonduje mnie stara kurwa");
     // printChar(fig_before_change);
-  }
+    }
 
-  while(change) // przeczekanie okresu niestabilnego
-  {
-    // Serial.print("DUPA zmiana ");
-    // Serial.println(iter);
-
+    while(change) // przeczekanie okresu niestabilnego
+    {
     prev_figures = figures;
     scan(false);
     getDropDown();
     mapToFigure();
     change = detect_board_change();
-    iter++;
-  }
-  
-  // check_for_new_fig();
-  check_for_picked_fig();
-  check_for_placed_back();
-  check_for_move();
-  
-  
+    }
+
+    check_for_new_fig();
+    check_for_picked_fig();
+    check_for_placed_back();
+    check_for_move();
 }

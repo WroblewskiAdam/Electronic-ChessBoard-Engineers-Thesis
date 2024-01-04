@@ -49,7 +49,6 @@ class Detector
         int new_row = -1;
         int new_col = -1;
 
-
         int iter = 0;
 
         std::array<std::array<int, 8>, 8> referenceValues =   {{{0,0,0,0,0,0,0,0}, // potrzebne do obliczania dropdownu 
