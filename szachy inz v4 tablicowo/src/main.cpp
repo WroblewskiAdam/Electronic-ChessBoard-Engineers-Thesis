@@ -124,9 +124,14 @@ void loop() {
     
     my_detector.scan(false);
     my_detector.getDropDown();
+    // my_detector.mapToFigure();
+
     // unsigned long end = micros();
     // unsigned long delta = end - start;
+    // Serial.println("Dropdown");
     my_detector.printInt(my_detector.dropDown);
+    // Serial.println("Figures");
+    // my_detector.printChar(my_detector.figures);
     // Serial.print("Execution time: ");
     // Serial.print(delta);
     // Serial.println(" microSeconds");
