@@ -184,16 +184,17 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
             {
                 if(new_col == moveSolver.white_en_passant_col && new_row == moveSolver.white_en_passant_row)
                 {
-                    Serial.println("DUPA");
                     board[new_row - 1][new_col] = "0";
                 }
             }
-
-
             change_turn();
+            correct_move = true;
         }
-        else Serial.println("!!!!!!!!!!!! WRONG MOVE !!!!!!!!!!!");
-
+        else 
+        {
+            Serial.println("!!!!!!!!!!!! WRONG MOVE !!!!!!!!!!!");
+            correct_move = false;
+        }
         // TODO - detekcja ruchu en passant i zbicie bierki przeciwnika
     }
 }

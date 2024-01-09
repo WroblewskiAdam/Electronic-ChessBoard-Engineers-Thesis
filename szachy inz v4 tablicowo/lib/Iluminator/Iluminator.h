@@ -19,6 +19,7 @@ class Iluminator
         uint32_t red = pixels.Color(255, 0, 0);
         uint32_t green = pixels.Color(0, 255, 0);
         uint32_t blue = pixels.Color(0, 0, 255);
+        uint32_t orange = pixels.Color(255, 140, 0);
 
         bool is_dark = true;
             

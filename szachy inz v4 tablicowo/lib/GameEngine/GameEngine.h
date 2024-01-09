@@ -93,6 +93,7 @@ class GameEngine
                                         {"0","0","0","0","0","0","0","0"}}};
 
         bool whites_turn = true;
+        bool correct_move = true;
         
         GameEngine();
         // void init_board(const char (&myArray)[8][8]);

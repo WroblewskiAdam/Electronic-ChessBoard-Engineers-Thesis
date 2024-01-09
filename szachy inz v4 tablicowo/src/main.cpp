@@ -24,23 +24,23 @@ Iluminator my_iluminator;
 //                       {'0','0','0','0','0','0','0','0'}};
 
 
-char figures_full[8][8] ={{'r','n','b','q','k','b','n','r'},
-                          {'p','p','p','p','p','p','p','p'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'P','P','P','P','P','P','P','P'},
-                          {'R','N','B','Q','K','B','N','R'}};
+// char figures_full[8][8] ={{'r','n','b','q','k','b','n','r'},
+//                           {'p','p','p','p','p','p','p','p'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'P','P','P','P','P','P','P','P'},
+//                           {'R','N','B','Q','K','B','N','R'}};
 
-char figures[8][8] =     {{'r','n','b','q','k','b','n','r'},
-                          {'p','p','p','p','p','0','0','p'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'0','0','0','0','0','0','0','0'},
-                          {'P','P','P','0','0','P','P','P'},
-                          {'R','N','B','Q','K','B','N','R'}};
+// char figures[8][8] =     {{'r','n','b','q','k','b','n','r'},
+//                           {'p','p','p','p','p','0','0','p'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'0','0','0','0','0','0','0','0'},
+//                           {'P','P','P','0','0','P','P','P'},
+//                           {'R','N','B','Q','K','B','N','R'}};
 
 int state = 0;
 
@@ -118,6 +118,21 @@ void setup() {
 }
 
 
+bool check_scan_board_equality(){
+
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+           if(my_detector.figures[i][j] != myGameEngine.board[i][j][0] ) return false;
+        }
+    }
+    return true;
+}
+
+
+
+
 void loop() {
     // unsigned long start = micros();
     
@@ -140,7 +155,7 @@ void loop() {
     {
         case 1:
             Serial.println("Stan 1");
-            state = 0;
+            state = 4;
             my_iluminator.light_all_sequence(my_iluminator.red);
             my_iluminator.light_all_sequence(my_iluminator.green);
             my_iluminator.light_all_sequence(my_iluminator.blue);
@@ -171,44 +186,50 @@ void loop() {
             break;
 
         case 5:
-            // Serial.println("Stan 5");
             my_detector.scanBoard();
-            // Serial.println("dropdown:");
-            // my_detector.printInt(my_detector.rawValues);
-            // Serial.println("figures:");
-            // my_detector.printChar(my_detector.figures);
-            // Serial.println("board:");
-            // myGameEngine.print_board(myGameEngine.board,1);
-            // Serial.println();
+            
+            // inicjalizacja pełnej planszy
+            if(my_detector.figures == my_detector.start_figures) state = 2; 
+
+            Serial.println("scan:");
+            my_detector.printChar(my_detector.figures);
+            Serial.println("board:");
+            myGameEngine.print_board(myGameEngine.board,1);
+           
+           
             if(my_detector.is_fig_picked == true) 
             {
-                // Serial.print("Podniesiono row: ");
-                // Serial.print(my_detector.picked_row);
-                // Serial.print(" col: ");
-                // Serial.println(my_detector.picked_col);
-                state = 6;
-            
+                Serial.println("Picked");
+                myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);
+                my_iluminator.light_moves(myGameEngine.final_moves, 0);
+                my_iluminator.light_moves(myGameEngine.final_strikes, -1);
             }
             else my_iluminator.clear();
 
 
             if(my_detector.made_move == true)
             {
-                // Serial.println("RUCH!!!!!");
                 myGameEngine.make_move(my_detector.old_row, my_detector.old_col, my_detector.new_row, my_detector.new_col);
-                myGameEngine.print_board(myGameEngine.board,1);
-                my_detector.reset();
+                if(myGameEngine.correct_move == true)
+                {
+                    myGameEngine.print_board(myGameEngine.board,1);
+                    my_detector.reset();
+                }
+                else
+                {
+                    my_iluminator.light(my_detector.old_row, my_detector.old_col, my_iluminator.orange);
+                    my_iluminator.light(my_detector.new_row, my_detector.new_col, my_iluminator.orange);
+                    if(check_scan_board_equality()) 
+                    {
+                        my_iluminator.clear();
+                        my_detector.reset();
+                    }
+                }
+
             }
             
             break;
         
-        case 6:
-            Serial.println("Stan 6");
-            myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);
-            my_iluminator.light_moves(myGameEngine.final_moves, 0);
-            my_iluminator.light_moves(myGameEngine.final_strikes, -1);
-            state = 5;
-            break;
 
         case 7:
             my_iluminator.clear();
