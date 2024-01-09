@@ -95,7 +95,8 @@ class GameEngine
         bool whites_turn = true;
         
         GameEngine();
-        void init_board(const char (&myArray)[8][8]);
+        // void init_board(const char (&myArray)[8][8]);
+        void init_board(const std::array<std::array<char, 8>, 8> &myArray);
         void init_fig(int row, int col, char fig);
         void print_board(const std::array<std::array<std::string, 8>, 8> &myArray, bool compact);
         void print_board(const std::array<std::array<int, 8>, 8> &myArray, bool compact);
@@ -105,6 +106,7 @@ class GameEngine
         bool evaluate_stalemate();
         void get_final_moves_for_figure(const int row, const int col);
         MoveSolver moveSolver;
+        void reset();
 
     private:
         void get_checking_figures(const std::array<std::array<std::string, 8>, 8> &myArray);

@@ -28,7 +28,8 @@ class Detector
         void mapToFigure();
         void getDropDown();
         void scan(bool reference);
-        
+        void reset();
+
         bool detect_board_change();
 
         void check_for_picked_fig();
@@ -36,6 +37,7 @@ class Detector
         void check_for_move();
         void check_for_new_fig();
         
+    
         int reading_num = 50;
 
         int change_row = -1;
@@ -46,8 +48,11 @@ class Detector
         int picked_row = -1;
         int picked_col = -1;
 
+        int old_row = -1;
+        int old_col = -1;
         int new_row = -1;
         int new_col = -1;
+        char made_move = false;
 
         int iter = 0;
 
@@ -139,7 +144,7 @@ class Detector
                     {{281,245,275,281,258,261,281,289}, //2,5
                     {253,249,297,265,269,277,306,309},
                     {263,286,303,305,288,274,256,263},
-                    {268,300,320,356,279,271,318,281},
+                    {268,300,320,286,279,271,318,281},
                     {251,274,244,263,251,255,261,261},
                     {253,247,247,261,253,251,243,239},
                     {251,236,254,259,251,256,261,234},

@@ -7,7 +7,7 @@ GameEngine::GameEngine()
 }
 
 
-void GameEngine::init_board(const char (&myArray)[8][8]){
+void GameEngine::init_board(const std::array<std::array<char, 8>, 8> &myArray){
     clear_board(board);
     whites_turn = true;
     for(int i = 0; i < 8; i++)
@@ -21,6 +21,20 @@ void GameEngine::init_board(const char (&myArray)[8][8]){
         }
     }
 }
+
+void GameEngine::reset()
+{
+    clear_board(board);
+    clear_board(board_cpy);
+    clear_array(checking_figures);
+    clear_array(check_saving_figures);
+    clear_array(check_saving_moves);
+    clear_array(king_allowed_moves);
+    clear_array(final_moves_for_figure);
+    clear_array(final_strikes);
+    clear_array(final_moves);
+}
+
 
 
 void GameEngine::init_fig(int row, int col, char fig){
@@ -374,55 +388,58 @@ void GameEngine::get_final_moves_for_figure(const int row, const int col)
     clear_array(final_moves);
     clear_array(final_strikes);
     char fig = board[row][col][0];
-    if(fig != '0' && tolower(fig) != 'k')
+    if((isupper(fig) && whites_turn == true) || (islower(fig) && whites_turn == false))
     {
-        get_checking_figures(board);
-        int checking_num = sum_array(checking_figures);
-        
-        if (checking_num == 0) 
+        if(fig != '0' && tolower(fig) != 'k')
         {
-            moveSolver.get_all_moves_for_figure(row, col, board);
-            std::array<std::array<int, 8>, 8> fig_all_moves = moveSolver.fig_all_moves;
-            for(int i = 0; i < 8; i++)
+            get_checking_figures(board);
+            int checking_num = sum_array(checking_figures);
+            
+            if (checking_num == 0) 
             {
-                for(int j = 0; j < 8; j++)
+                moveSolver.get_all_moves_for_figure(row, col, board);
+                std::array<std::array<int, 8>, 8> fig_all_moves = moveSolver.fig_all_moves;
+                for(int i = 0; i < 8; i++)
                 {
-                    if(fig_all_moves[i][j] == 1)
+                    for(int j = 0; j < 8; j++)
                     {
-                        bool check = check_move_for_check(row, col, i, j); //tru jesli ruch skutkuje szachem
-                        if(check == false) 
+                        if(fig_all_moves[i][j] == 1)
                         {
-                            final_moves_for_figure[i][j] = 1;
+                            bool check = check_move_for_check(row, col, i, j); //tru jesli ruch skutkuje szachem
+                            if(check == false) 
+                            {
+                                final_moves_for_figure[i][j] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            else if(checking_num == 1)
+            {
+                moveSolver.get_all_moves_for_figure(row, col, board);
+                std::array<std::array<int, 8>, 8> fig_all_moves = moveSolver.fig_all_moves;
+                get_check_saving_figures();
+                if (check_saving_figures[row][col] == 1)
+                {
+                    for(int i = 0; i < 8; i++)
+                    {
+                        for(int j = 0; j < 8; j++)
+                        {
+                            if(fig_all_moves[i][j] == 1 && check_saving_moves[i][j] == 1) final_moves_for_figure[i][j] = 1;
                         }
                     }
                 }
             }
         }
-        else if(checking_num == 1)
+        else if(fig != '0' && tolower(fig) == 'k')
         {
-            moveSolver.get_all_moves_for_figure(row, col, board);
-            std::array<std::array<int, 8>, 8> fig_all_moves = moveSolver.fig_all_moves;
-            get_check_saving_figures();
-            if (check_saving_figures[row][col] == 1)
-            {
-                for(int i = 0; i < 8; i++)
-                {
-                    for(int j = 0; j < 8; j++)
-                    {
-                        if(fig_all_moves[i][j] == 1 && check_saving_moves[i][j] == 1) final_moves_for_figure[i][j] = 1;
-                    }
-                }
-            }
+            clear_array(final_moves_for_figure);
+            get_king_allowed_moves();
+            final_moves_for_figure = king_allowed_moves;
         }
-    }
-    else if(fig != '0' && tolower(fig) == 'k')
-    {
-        clear_array(final_moves_for_figure);
-        get_king_allowed_moves();
-        final_moves_for_figure = king_allowed_moves;
-    }
 
-    separate_moves_strikes();
+        separate_moves_strikes();
+    }
 }
 
 

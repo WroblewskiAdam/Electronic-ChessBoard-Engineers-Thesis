@@ -121,15 +121,14 @@ void setup() {
 void loop() {
     // unsigned long start = micros();
     
-    
-    my_detector.scan(false);
-    my_detector.getDropDown();
+    // my_detector.scan(false);
+    // my_detector.getDropDown();
     // my_detector.mapToFigure();
 
     // unsigned long end = micros();
     // unsigned long delta = end - start;
-    // Serial.println("Dropdown");
-    my_detector.printInt(my_detector.dropDown);
+    // Serial.print("Dropdown");
+    // my_detector.printInt(my_detector.dropDown);
     // Serial.println("Figures");
     // my_detector.printChar(my_detector.figures);
     // Serial.print("Execution time: ");
@@ -137,51 +136,92 @@ void loop() {
     // Serial.println(" microSeconds");
 
 
-    // switch (state)
-    // {
-    //     case 1:
-    //         Serial.println("Stan 1");
-    //         // lcd.clear();
-    //         // lcd.print("Stan 1");
-    //         // display...
-
-    //         state = 0;
-    //         break;
+    switch (state)
+    {
+        case 1:
+            Serial.println("Stan 1");
+            state = 0;
+            my_iluminator.light_all_sequence(my_iluminator.red);
+            my_iluminator.light_all_sequence(my_iluminator.green);
+            my_iluminator.light_all_sequence(my_iluminator.blue);
+            break;
         
-    //     case 2:
-    //         Serial.println("Stan 2");
-    //         Serial.println("Init");
-    //         // lcd.clear();
-    //         // lcd.print("Stan 2");
+        case 2:
+            Serial.println("Stan 2");
+            Serial.println("Init");
+            myGameEngine.init_board(my_detector.figures);
+            myGameEngine.print_board(myGameEngine.board,0);
+            state = 4;
+            break;
             
-    //         myGameEngine.init_board(figures);
+        case 3: 
+            Serial.println("Stan 3");
+            Serial.print("plansza ( ruch  ");
+            if(myGameEngine.whites_turn) Serial.print("białych");
+            else Serial.print("czarnych");
+            Serial.println("  ):");
+            myGameEngine.print_board(myGameEngine.board,0);
+            state = 4;
+            break;
+
+        case 4:
+            Serial.println("Stan 4");
+            Serial.println("Scan");
+            state = 5;
+            break;
+
+        case 5:
+            // Serial.println("Stan 5");
+            my_detector.scanBoard();
+            // Serial.println("dropdown:");
+            // my_detector.printInt(my_detector.rawValues);
+            // Serial.println("figures:");
+            // my_detector.printChar(my_detector.figures);
+            // Serial.println("board:");
+            // myGameEngine.print_board(myGameEngine.board,1);
+            // Serial.println();
+            if(my_detector.is_fig_picked == true) 
+            {
+                // Serial.print("Podniesiono row: ");
+                // Serial.print(my_detector.picked_row);
+                // Serial.print(" col: ");
+                // Serial.println(my_detector.picked_col);
+                state = 6;
             
-    //         Serial.print("plansza ( ruch  ");
-    //         if(myGameEngine.whites_turn) Serial.print("białych");
-    //         else Serial.print("czarnych");
-    //         Serial.println("  ):");
-    //         myGameEngine.print_board(myGameEngine.board,0);
+            }
+            else my_iluminator.clear();
+
+
+            if(my_detector.made_move == true)
+            {
+                // Serial.println("RUCH!!!!!");
+                myGameEngine.make_move(my_detector.old_row, my_detector.old_col, my_detector.new_row, my_detector.new_col);
+                myGameEngine.print_board(myGameEngine.board,1);
+                my_detector.reset();
+            }
             
-    //         state = 0;
+            break;
+        
+        case 6:
+            Serial.println("Stan 6");
+            myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);
+            my_iluminator.light_moves(myGameEngine.final_moves, 0);
+            my_iluminator.light_moves(myGameEngine.final_strikes, -1);
+            state = 5;
+            break;
 
-    //         break;
+        case 7:
+            my_iluminator.clear();
+            my_detector.reset();
+            myGameEngine.reset();
+            break;
+        
+        default:
+            break;
+    }
 
-    //     case 3:
-    //         Serial.println("Stan 3");
-    //         Serial.println("Scan");
-    //         state = 4;
-    //         break;
-
-    //     case 4:
-    //         my_detector.scanBoard();
-    //         break;
-
-    //     default:
-    //         break;
-    // }
-
-    // recvWithEndMarker();
-    // showNewData();
+    recvWithEndMarker();
+    showNewData();
 
 
 

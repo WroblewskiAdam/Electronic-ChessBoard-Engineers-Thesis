@@ -14,7 +14,6 @@ int Iluminator::get_pixel_id(int row, int col)
 
 void Iluminator::light(int row, int col, uint32_t color)
 {
-    clear();
     int n = get_pixel_id(row, col);
     pixels.setPixelColor(n, color);
     pixels.show();
@@ -52,12 +51,12 @@ void Iluminator::light_moves(const std::array<std::array<int, 8>, 8> &myArray, i
 
 void Iluminator::light_all_sequence(uint32_t my_color)
 {
-    pixels.clear();
+    // pixels.clear();
     for(int i = 0; i < 64; i++)
     {
         pixels.setPixelColor(i,my_color);
         pixels.show();
-        delay(50);
+        delay(10);
     }
     is_dark = false;
 }
