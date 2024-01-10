@@ -438,7 +438,7 @@ void GameEngine::get_final_moves_for_figure(const int row, const int col)
             get_king_allowed_moves();
             final_moves_for_figure = king_allowed_moves;
         }
-
+        moveSolver.get_all_moves_for_figure(row, col, board);
         separate_moves_strikes();
     }
 }
@@ -454,7 +454,7 @@ void GameEngine::separate_moves_strikes()
             {
                 char fig = board[i][j][0];
                 if(fig == '0') final_moves[i][j] = 1;
-                else final_strikes[i][j] = 1;
+                if(moveSolver.fig_strikes[i][j] == 1) final_strikes[i][j] = 1;
             }
         }
     }

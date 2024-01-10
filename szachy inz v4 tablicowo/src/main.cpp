@@ -43,6 +43,7 @@ Iluminator my_iluminator;
 //                           {'R','N','B','Q','K','B','N','R'}};
 
 int state = 0;
+bool is_initialized = false;
 
 const byte numChars = 32;
 char receivedChars[numChars];
@@ -118,16 +119,33 @@ void setup() {
 }
 
 
-bool check_scan_board_equality(){
+bool check_consistency(){
 
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
         {
-           if(my_detector.figures[i][j] != myGameEngine.board[i][j][0] ) return false;
+           if(my_detector.figures[i][j] != myGameEngine.board[i][j][0] && my_detector.is_fig_picked == false) return false;
         }
     }
     return true;
+}
+
+void light_incoherent_positions(){
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+           if(my_detector.figures[i][j] != myGameEngine.board[i][j][0])
+           {
+                Serial.print("STH WRONG ON: row ");
+                Serial.print(i);
+                Serial.print(" col ");
+                Serial.println(j);
+                my_iluminator.light(i,j,my_iluminator.orange);
+           }
+        }
+    }
 }
 
 
@@ -157,8 +175,8 @@ void loop() {
             Serial.println("Stan 1");
             state = 4;
             my_iluminator.light_all_sequence(my_iluminator.red);
-            my_iluminator.light_all_sequence(my_iluminator.green);
-            my_iluminator.light_all_sequence(my_iluminator.blue);
+            // my_iluminator.light_all_sequence(my_iluminator.green);
+            // my_iluminator.light_all_sequence(my_iluminator.blue);
             break;
         
         case 2:
@@ -166,6 +184,7 @@ void loop() {
             Serial.println("Init");
             myGameEngine.init_board(my_detector.figures);
             myGameEngine.print_board(myGameEngine.board,0);
+            is_initialized = true;
             state = 4;
             break;
             
@@ -188,24 +207,33 @@ void loop() {
         case 5:
             my_detector.scanBoard();
             
-            // inicjalizacja pełnej planszy
-            if(my_detector.figures == my_detector.start_figures) state = 2; 
-
             Serial.println("scan:");
             my_detector.printChar(my_detector.figures);
             Serial.println("board:");
             myGameEngine.print_board(myGameEngine.board,1);
-           
-           
-            if(my_detector.is_fig_picked == true) 
+            
+            // inicjalizacja pełnej planszy
+            if(my_detector.figures == my_detector.start_figures) 
             {
-                Serial.println("Picked");
-                myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);
+                state = 2; 
+                is_initialized = true;
+            }
+
+
+            if(is_initialized) light_incoherent_positions();
+
+            if(my_detector.is_fig_picked == true && myGameEngine.board[my_detector.picked_row][my_detector.picked_col] != "0") 
+            {
+                // Serial.println("Picked");
+                myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);    
+                my_iluminator.light(my_detector.picked_row,my_detector.picked_col, my_iluminator.blue);
                 my_iluminator.light_moves(myGameEngine.final_moves, 0);
                 my_iluminator.light_moves(myGameEngine.final_strikes, -1);
             }
-            else my_iluminator.clear();
-
+            if(my_detector.is_fig_picked == false && check_consistency() == true)
+            {
+                my_iluminator.clear();
+            }
 
             if(my_detector.made_move == true)
             {
@@ -219,7 +247,7 @@ void loop() {
                 {
                     my_iluminator.light(my_detector.old_row, my_detector.old_col, my_iluminator.orange);
                     my_iluminator.light(my_detector.new_row, my_detector.new_col, my_iluminator.orange);
-                    if(check_scan_board_equality()) 
+                    if(check_consistency()) 
                     {
                         my_iluminator.clear();
                         my_detector.reset();
@@ -235,6 +263,7 @@ void loop() {
             my_iluminator.clear();
             my_detector.reset();
             myGameEngine.reset();
+            is_initialized = false;
             break;
         
         default:
