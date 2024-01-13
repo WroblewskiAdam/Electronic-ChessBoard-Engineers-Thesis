@@ -56,11 +56,38 @@ void Iluminator::light_all_sequence(uint32_t my_color)
     {
         pixels.setPixelColor(i,my_color);
         pixels.show();
-        delay(10);
+        delay(30);
     }
     is_dark = false;
 }
 
+
+void Iluminator::light_all_at_once(uint32_t my_color)
+{
+    for(int i = 0; i < 64; i++)
+    {
+        pixels.setPixelColor(i,my_color);
+    }
+    pixels.show();
+    is_dark = false;
+}
+
+void Iluminator::flash(int num, uint32_t my_color)
+{
+    for(int j = 0; j < num; j++)
+    {
+        for(int i = 0; i < 64; i++)
+        {
+            pixels.setPixelColor(i,my_color);
+        }
+        pixels.show();
+        delay(250);
+        pixels.clear();
+        pixels.show();
+        delay(250);
+    }
+    is_dark = false;
+}
 
 void Iluminator::start_animation()
 {

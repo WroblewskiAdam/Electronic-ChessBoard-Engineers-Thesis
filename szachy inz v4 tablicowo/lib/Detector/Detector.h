@@ -36,6 +36,8 @@ class Detector
         void check_for_placed_back();
         void check_for_move();
         void check_for_new_fig();
+
+        bool check_for_init_board();
         
     
         int reading_num = 50;
@@ -52,7 +54,7 @@ class Detector
         int old_col = -1;
         int new_row = -1;
         int new_col = -1;
-        char made_move = false;
+        bool made_move = false;
 
         int iter = 0;
 

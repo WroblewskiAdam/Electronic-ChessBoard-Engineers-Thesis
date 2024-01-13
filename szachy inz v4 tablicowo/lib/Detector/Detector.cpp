@@ -102,19 +102,18 @@ void Detector::mapToFigure()
   {
     for(int j = 0; j < 8; j++)
     {
-      
         if      (dropDown[i][j] > calibration[0][i][j] - 120)
-            { figures[i][j] = 'P';} //0 - Pawn
+            figures[i][j] = 'P'; //0 - Pawn
         else if (dropDown[i][j] < calibration[1][i][j] + 90 && dropDown[i][j] > calibration[1][i][j] - 50)  
-            { figures[i][j] = 'Q';} //1 - Queen
+            figures[i][j] = 'Q'; //1 - Queen
         else if (dropDown[i][j] < calibration[2][i][j] + 80 && dropDown[i][j] > calibration[2][i][j] - 80)
-            { figures[i][j] = 'N';} //1,5 - Knight
+            figures[i][j] = 'N'; //1,5 - Knight
         else if (dropDown[i][j] < calibration[3][i][j] + 70 && dropDown[i][j] > calibration[3][i][j] - 60)  
-            { figures[i][j] = 'K';} //2,5 - King
+            figures[i][j] = 'K'; //2,5 - King
         else if (dropDown[i][j] < calibration[4][i][j] + 60 && dropDown[i][j] > calibration[4][i][j] - 30)  
-            { figures[i][j] = 'B';} //4,5 - Bishop
+            figures[i][j] = 'B'; //4,5 - Bishop
         else if (dropDown[i][j] < calibration[5][i][j] + 30 && dropDown[i][j] > calibration[5][i][j] - 20)  
-            { figures[i][j] = 'R';} //7- Rook
+            figures[i][j] = 'R'; //7- Rook
         
 
         else if (dropDown[i][j] < calibration[6][i][j] + 150)
@@ -358,4 +357,23 @@ void Detector::scanBoard()
     check_for_picked_fig();
     check_for_placed_back();
     check_for_move();
+}
+
+bool Detector::check_for_init_board()
+{
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            if (figures[i][j] != start_figures[i][j])
+            {
+                Serial.print("diff on: ");
+                Serial.print(i);
+                Serial.print(" ");
+                Serial.println(j);
+                return false;
+            }
+        }
+    }
+    return true;
 }

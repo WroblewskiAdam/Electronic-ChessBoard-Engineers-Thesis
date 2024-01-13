@@ -110,6 +110,7 @@ void end_game()
 
 void setup() {
     Serial.begin(115200);
+    my_iluminator.light_all_at_once(my_iluminator.blue);
     // lcd.init();
     // lcd.backlight();
     // lcd.setCursor(0,0);
@@ -174,7 +175,8 @@ void loop() {
         case 1:
             Serial.println("Stan 1");
             state = 4;
-            my_iluminator.light_all_sequence(my_iluminator.red);
+            my_iluminator.flash(3, my_iluminator.green);
+            // my_iluminator.light_all_sequence(my_iluminator.red);
             // my_iluminator.light_all_sequence(my_iluminator.green);
             // my_iluminator.light_all_sequence(my_iluminator.blue);
             break;
@@ -211,17 +213,33 @@ void loop() {
             my_detector.printChar(my_detector.figures);
             Serial.println("board:");
             myGameEngine.print_board(myGameEngine.board,1);
+            Serial.print("detector fig picked = ");
+            Serial.print(my_detector.is_fig_picked);
+            Serial.print(" | detector made_move = ");
+            Serial.print(my_detector.made_move);
+            Serial.print(" | gameEngine correct_move = ");
+            Serial.print(myGameEngine.correct_move);
+            Serial.print(" | iluminator is_dark = ");
+            Serial.println(my_iluminator.is_dark);
+            
             
             // inicjalizacja pełnej planszy
-            if(my_detector.figures == my_detector.start_figures) 
+            if(is_initialized == false) 
             {
-                state = 2; 
-                is_initialized = true;
+                if(my_detector.check_for_init_board())
+                {
+                    my_iluminator.flash(3, my_iluminator.green);
+                    state = 2; 
+                    is_initialized = true;
+                }
             }
 
 
-            if(is_initialized) light_incoherent_positions();
-
+            if(is_initialized && my_detector.is_fig_picked == false) 
+            {
+                my_iluminator.clear();
+                light_incoherent_positions();
+            }
             if(my_detector.is_fig_picked == true && myGameEngine.board[my_detector.picked_row][my_detector.picked_col] != "0") 
             {
                 // Serial.println("Picked");
@@ -242,6 +260,7 @@ void loop() {
                 {
                     myGameEngine.print_board(myGameEngine.board,1);
                     my_detector.reset();
+                    my_iluminator.clear();
                 }
                 else
                 {
