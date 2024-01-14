@@ -453,8 +453,8 @@ void GameEngine::separate_moves_strikes()
             if(final_moves_for_figure[i][j] == 1)
             {
                 char fig = board[i][j][0];
-                if(fig == '0') final_moves[i][j] = 1;
-                if(moveSolver.fig_strikes[i][j] == 1) final_strikes[i][j] = 1;
+                if(fig == '0' && moveSolver.fig_strikes[i][j] != 1) final_moves[i][j] = 1;
+                else if(moveSolver.fig_strikes[i][j] == 1) final_strikes[i][j] = 1;
             }
         }
     }
@@ -522,9 +522,12 @@ bool GameEngine::short_castling_condition(int &king_row, std::array<std::array<s
     {
         if(myArray[king_row][5] == "0" && myArray[king_row][6] == "0") // nie ma bierek pomiedzy K a R
         {
-            bool check_1 = check_move_for_check(king_row, 4, king_row, 5); //true jesli szach
-            bool check_2 = check_move_for_check(king_row, 4, king_row, 6); // true jesli szach
-            if( !check_1 && !check_2 ) return true;
+            bool check_1 = check_move_for_check(king_row, 4, king_row, 5); //true jesli szach na pozycji miedzy królem a wieza
+            bool check_2 = check_move_for_check(king_row, 4, king_row, 6); // true jesli szach na pozycji miedzy królem a wieza
+            get_checking_figures(board);
+            bool check_3 = (sum_array(checking_figures) == 0) ? true : false; 
+
+            if( !check_1 && !check_2 && check_3) return true;
             else return false;
         }
         else
@@ -547,7 +550,9 @@ bool GameEngine::long_castling_condition(int &king_row, std::array<std::array<st
         {
             bool check_1 = check_move_for_check(king_row, 4, king_row, 2); //true jesli szach
             bool check_2 = check_move_for_check(king_row, 4, king_row, 3); // true jesli szach
-            if( !check_1 && !check_2 ) return true;
+            get_checking_figures(board);
+            bool check_3 = (sum_array(checking_figures) == 0) ? true : false; 
+            if( !check_1 && !check_2 && check_3) return true;
             else return false;
         }
         else
