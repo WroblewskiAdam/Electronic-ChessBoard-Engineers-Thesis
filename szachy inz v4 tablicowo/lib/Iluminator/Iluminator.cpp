@@ -32,12 +32,8 @@ void Iluminator::clear()
 }
 
 
-void Iluminator::light_moves(const std::array<std::array<int, 8>, 8> &myArray, int move_type)
+void Iluminator::light_moves(const std::array<std::array<int, 8>, 8> &myArray, uint32_t color)
 {
-    uint32_t color;
-    if(move_type == 0) color = green;
-    else if(move_type == -1) color = red;
-
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)

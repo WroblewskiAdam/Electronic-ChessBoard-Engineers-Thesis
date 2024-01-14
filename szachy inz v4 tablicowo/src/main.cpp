@@ -44,6 +44,7 @@ Iluminator my_iluminator;
 
 int state = 0;
 bool is_initialized = false;
+bool is_consistent = true;
 
 const byte numChars = 32;
 char receivedChars[numChars];
@@ -107,7 +108,6 @@ void end_game()
 
 
 
-
 void setup() {
     Serial.begin(115200);
     my_iluminator.light_all_at_once(my_iluminator.blue);
@@ -120,16 +120,24 @@ void setup() {
 }
 
 
-bool check_consistency(){
+void check_consistency(){
 
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
         {
-           if(my_detector.figures[i][j] != myGameEngine.board[i][j][0] && my_detector.is_fig_picked == false) return false;
+            if(my_detector.figures[i][j] != myGameEngine.board[i][j][0]) 
+            {
+                Serial.print("Różnica na row: ");
+                Serial.print(i);
+                Serial.print(" col: ");
+                Serial.println(j);
+                is_consistent = false;
+                return;
+            }
         }
     }
-    return true;
+    is_consistent = true;
 }
 
 void light_incoherent_positions(){
@@ -139,10 +147,6 @@ void light_incoherent_positions(){
         {
            if(my_detector.figures[i][j] != myGameEngine.board[i][j][0])
            {
-                Serial.print("STH WRONG ON: row ");
-                Serial.print(i);
-                Serial.print(" col ");
-                Serial.println(j);
                 my_iluminator.light(i,j,my_iluminator.orange);
            }
         }
@@ -207,16 +211,17 @@ void loop() {
             break;
 
         case 5:
+            Serial.println();
+            Serial.println("###########################################################################");
             my_detector.scanBoard();
-            
             Serial.println("scan:");
             my_detector.printChar(my_detector.figures);
             Serial.println("board:");
             myGameEngine.print_board(myGameEngine.board,1);
-            Serial.print("detector fig picked = ");
-            Serial.print(my_detector.is_fig_picked);
-            Serial.print(" | detector made_move = ");
-            Serial.print(my_detector.made_move);
+            // Serial.print("detector fig picked = ");
+            // Serial.print(my_detector.is_fig_picked);
+            // Serial.print(" | detector made_move = ");
+            // Serial.print(my_detector.made_move);
             Serial.print(" | gameEngine correct_move = ");
             Serial.print(myGameEngine.correct_move);
             Serial.print(" | iluminator is_dark = ");
@@ -234,49 +239,76 @@ void loop() {
                 }
             }
 
+            if(is_initialized == true)
+            {
+                check_consistency();
+                if (is_consistent == false && my_detector.is_fig_picked == false) state = 8;
+        
+        
 
-            if(is_initialized && my_detector.is_fig_picked == false) 
-            {
-                my_iluminator.clear();
-                light_incoherent_positions();
-            }
-            if(my_detector.is_fig_picked == true && myGameEngine.board[my_detector.picked_row][my_detector.picked_col] != "0") 
-            {
-                // Serial.println("Picked");
-                myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);    
-                my_iluminator.light(my_detector.picked_row,my_detector.picked_col, my_iluminator.blue);
-                my_iluminator.light_moves(myGameEngine.final_moves, 0);
-                my_iluminator.light_moves(myGameEngine.final_strikes, -1);
-            }
-            if(my_detector.is_fig_picked == false && check_consistency() == true)
-            {
-                my_iluminator.clear();
-            }
+                Serial.print("is_consistent: ");
+                Serial.println(is_consistent);
 
-            if(my_detector.made_move == true)
-            {
-                myGameEngine.make_move(my_detector.old_row, my_detector.old_col, my_detector.new_row, my_detector.new_col);
-                if(myGameEngine.correct_move == true)
+                
+                if(my_detector.is_fig_picked == true && myGameEngine.board[my_detector.picked_row][my_detector.picked_col] != "0") 
                 {
-                    myGameEngine.print_board(myGameEngine.board,1);
-                    my_detector.reset();
-                    my_iluminator.clear();
+                    myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);    
+                    my_iluminator.light(my_detector.picked_row,my_detector.picked_col, my_iluminator.blue);
+                    my_iluminator.light_moves(myGameEngine.final_moves, my_iluminator.green);
+                    my_iluminator.light_moves(myGameEngine.final_strikes, my_iluminator.red);
+
+                    Serial.println("Ruchy: ");
+                    myGameEngine.print_board(myGameEngine.final_moves, 1);
+
+                    Serial.println("Bicia: ");
+                    myGameEngine.print_board(myGameEngine.final_strikes,1);
                 }
-                else
+                
+                if(my_detector.made_move == true)
                 {
-                    my_iluminator.light(my_detector.old_row, my_detector.old_col, my_iluminator.orange);
-                    my_iluminator.light(my_detector.new_row, my_detector.new_col, my_iluminator.orange);
-                    if(check_consistency()) 
+                    myGameEngine.make_move(my_detector.old_row, my_detector.old_col, my_detector.new_row, my_detector.new_col);
+                    if(myGameEngine.correct_move == true)
                     {
-                        my_iluminator.clear();
+                        myGameEngine.print_board(myGameEngine.board,1);
                         my_detector.reset();
+                        my_iluminator.clear();
+                    }
+                    else if(myGameEngine.correct_move == false)
+                    {
+                        light_incoherent_positions();
+                        // my_iluminator.light(my_detector.old_row, my_detector.old_col, my_iluminator.orange);
+                        // my_iluminator.light(my_detector.new_row, my_detector.new_col, my_iluminator.orange);
+                        if(is_consistent == true) 
+                        {
+                            my_iluminator.clear();
+                            my_detector.reset();
+                        }
                     }
                 }
 
+                if(my_detector.is_fig_picked == false)
+                {
+                    my_iluminator.clear();
+                    my_detector.reset();
+                }
+
             }
-            
             break;
         
+        case 8:
+            //Stan w którym obsługujemy sytuację niezgodną z zasadmi.
+            Serial.println("JESTEŚ W WIĘZIENIU");
+            my_detector.scanBoard();
+            if(my_detector.is_fig_picked) my_iluminator.clear();
+            light_incoherent_positions();
+            check_consistency();
+            if (is_consistent)
+            {
+                state = 5;
+                my_iluminator.clear();
+                my_detector.reset();
+            }
+            break;
 
         case 7:
             my_iluminator.clear();

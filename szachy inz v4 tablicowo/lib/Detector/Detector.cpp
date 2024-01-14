@@ -42,10 +42,10 @@ void Detector::reset()
 
 void Detector::scan(bool reference)
 {   
-    reading_num = 50;
+    reading_num = 25;
     if (reference){
         Serial.println("Obtainig reference values");
-        reading_num = 1000;
+        reading_num = 100;
     }
 
     clear_array(rawValues);
@@ -357,6 +357,11 @@ void Detector::scanBoard()
     check_for_picked_fig();
     check_for_placed_back();
     check_for_move();
+
+    Serial.print("detector fig picked = ");
+    Serial.print(is_fig_picked);
+    Serial.print(" | detector made_move = ");
+    Serial.println(made_move);
 }
 
 bool Detector::check_for_init_board()
