@@ -42,7 +42,7 @@ void Detector::reset()
 
 void Detector::scan(bool reference)
 {   
-    reading_num = 25;
+    reading_num = 30;
     if (reference){
         Serial.println("Obtainig reference values");
         reading_num = 100;

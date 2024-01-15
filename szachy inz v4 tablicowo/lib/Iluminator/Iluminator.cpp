@@ -31,6 +31,41 @@ void Iluminator::clear()
     }
 }
 
+void Iluminator::light_whites_win()
+{
+    for(int j = 0; j < 8; j++)
+    {
+        light(6, j, green);
+        light(7, j, green);
+        light(0, j, red);
+        light(1, j, red);
+    }
+    is_dark = false;
+}
+
+void Iluminator::light_blacks_win()
+{
+     for(int j = 0; j < 8; j++)
+    {
+        light(6, j, red);
+        light(7, j, red);
+        light(0, j, green);
+        light(1, j, green);
+    }
+    is_dark = false;
+}
+
+void Iluminator::light_draw()
+{
+     for(int j = 0; j < 8; j++)
+    {
+        light(6, j, green);
+        light(7, j, green);
+        light(0, j, green);
+        light(1, j, green);
+    }
+    is_dark = false;
+}
 
 void Iluminator::light_moves(const std::array<std::array<int, 8>, 8> &myArray, uint32_t color)
 {

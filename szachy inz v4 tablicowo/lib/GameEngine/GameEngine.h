@@ -94,6 +94,10 @@ class GameEngine
 
         bool whites_turn = true;
         bool correct_move = true;
+        bool promotion = false;
+        bool promotion_white = false;
+        int prom_row = -1;
+        int prom_col = -1;
         
         GameEngine();
         // void init_board(const char (&myArray)[8][8]);
@@ -103,6 +107,9 @@ class GameEngine
         void print_board(const std::array<std::array<int, 8>, 8> &myArray, bool compact);
         void change_turn();
         void make_move(int row, int col, int new_row, int new_col);
+        void promote(int row, int col, char fig);
+        void check_for_promotion();
+        void reset_promotion();
         bool evaluate_checkmate();
         bool evaluate_stalemate();
         void get_final_moves_for_figure(const int row, const int col);

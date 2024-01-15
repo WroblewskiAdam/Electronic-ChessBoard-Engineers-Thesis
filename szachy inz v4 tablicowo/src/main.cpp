@@ -110,7 +110,7 @@ void end_game()
 
 void setup() {
     Serial.begin(115200);
-    my_iluminator.light_all_at_once(my_iluminator.blue);
+    my_iluminator.light_all_at_once(my_iluminator.pink);
     // lcd.init();
     // lcd.backlight();
     // lcd.setCursor(0,0);
@@ -234,22 +234,22 @@ void loop() {
                 if(my_detector.check_for_init_board())
                 {
                     my_iluminator.flash(3, my_iluminator.green);
-                    state = 2; 
                     is_initialized = true;
+                    state = 2; 
                 }
             }
 
             if(is_initialized == true)
             {
+
+                if(myGameEngine.evaluate_checkmate()) state = 11;
+
                 check_consistency();
                 if (is_consistent == false && my_detector.is_fig_picked == false) state = 8;
         
-        
-
                 Serial.print("is_consistent: ");
                 Serial.println(is_consistent);
 
-                
                 if(my_detector.is_fig_picked == true && myGameEngine.board[my_detector.picked_row][my_detector.picked_col] != "0") 
                 {
                     myGameEngine.get_final_moves_for_figure(my_detector.picked_row,my_detector.picked_col);    
@@ -257,11 +257,11 @@ void loop() {
                     my_iluminator.light_moves(myGameEngine.final_moves, my_iluminator.green);
                     my_iluminator.light_moves(myGameEngine.final_strikes, my_iluminator.red);
 
-                    Serial.println("Ruchy: ");
-                    myGameEngine.print_board(myGameEngine.final_moves, 1);
+                    // Serial.println("Ruchy: ");
+                    // myGameEngine.print_board(myGameEngine.final_moves, 1);
 
-                    Serial.println("Bicia: ");
-                    myGameEngine.print_board(myGameEngine.final_strikes,1);
+                    // Serial.println("Bicia: ");
+                    // myGameEngine.print_board(myGameEngine.final_strikes,1);
                 }
                 
                 if(my_detector.made_move == true)
@@ -272,6 +272,8 @@ void loop() {
                         myGameEngine.print_board(myGameEngine.board,1);
                         my_detector.reset();
                         my_iluminator.clear();
+                        myGameEngine.check_for_promotion();
+                        if (myGameEngine.promotion == true) state = 9;
                     }
                     else if(myGameEngine.correct_move == false)
                     {
@@ -308,6 +310,52 @@ void loop() {
                 my_iluminator.clear();
                 my_detector.reset();
             }
+            break;
+        
+        case 9:
+            //Stan w którym obsługujemy promocje.
+            Serial.println(" !!!!!!!!!!!!!!!!!!!!!!! Promocja !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+            my_iluminator.light(myGameEngine.prom_row, myGameEngine.prom_col, my_iluminator.pink);
+            my_detector.scanBoard();
+            
+            if(myGameEngine.promotion_white == true) // promocja bialych
+            {
+                if(my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col] != '0' &&
+                   my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col] != 'P' && 
+                   my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col] != 'K' && 
+                   isupper(my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col]))
+                {
+                    myGameEngine.promote(myGameEngine.prom_row, myGameEngine.prom_col, my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col]);
+                    my_iluminator.clear();
+                    my_detector.reset();
+                    myGameEngine.reset_promotion();
+                    state = 5;
+                }
+            }
+            else if (myGameEngine.promotion_white == false) //promocja czarnych
+            {
+                if(my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col] != '0' &&
+                   my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col] != 'p' && 
+                   my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col] != 'k' && 
+                   islower(my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col]))
+                {
+                    myGameEngine.promote(myGameEngine.prom_row, myGameEngine.prom_col, my_detector.figures[myGameEngine.prom_row][myGameEngine.prom_col]);
+                    my_iluminator.clear();
+                    my_detector.reset();
+                    myGameEngine.reset_promotion();
+                    state = 5;
+                }
+            }
+            break;
+        
+        case 10: //pat
+            my_iluminator.light_draw();
+            break;
+        
+        case 11: // szach
+            if(myGameEngine.whites_turn) my_iluminator.light_blacks_win();
+            else my_iluminator.light_whites_win();
             break;
 
         case 7:

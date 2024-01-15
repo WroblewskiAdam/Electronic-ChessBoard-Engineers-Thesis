@@ -18,11 +18,16 @@ class Iluminator
         void light_all_sequence(uint32_t my_color);
         void clear();
         void start_animation();
+        void light_whites_win();
+        void light_blacks_win();
+        void light_draw();
+
         uint32_t red = pixels.Color(255, 0, 0);
         uint32_t green = pixels.Color(0, 255, 0);
         uint32_t blue = pixels.Color(0, 0, 255);
         uint32_t orange = pixels.Color(255, 140, 0);
         uint32_t purple = pixels.Color(60, 0, 100);
+        uint32_t pink = pixels.Color(170, 51, 106);
 
         bool is_dark = true;
             

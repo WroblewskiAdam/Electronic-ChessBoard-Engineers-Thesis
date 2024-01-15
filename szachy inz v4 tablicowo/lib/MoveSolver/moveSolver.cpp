@@ -135,7 +135,7 @@ void MoveSolver::get_pawn_moves(int row, int col, const std::array<std::array<st
                 move_type = check_move_type(moving_figure[0], attacked_figure[0]);
    
                 if(move_type == -1) fig_strikes[new_row][new_col] = 1;
-                if(new_col == black_en_passant_col) 
+                if(new_col == black_en_passant_col && new_row == black_en_passant_row) 
                 {
                     fig_strikes[new_row][new_col] = 1; // en pasant
                 }
@@ -175,7 +175,10 @@ void MoveSolver::get_pawn_moves(int row, int col, const std::array<std::array<st
                 attacked_figure = myArray[new_row][new_col];
                 move_type = check_move_type(moving_figure[0], attacked_figure[0]);
                 if(move_type == -1) fig_strikes[new_row][new_col] = 1;
-                if(new_col == white_en_passant_col) fig_strikes[new_row][new_col] = 1; // en pasant
+                if(new_col == white_en_passant_col && new_row == white_en_passant_row) 
+                {
+                    fig_strikes[new_row][new_col] = 1; // en pasant
+                }
             }
         }
     }

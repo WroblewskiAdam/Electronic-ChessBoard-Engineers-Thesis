@@ -145,7 +145,7 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
     if(fig != "0")
     {
         get_final_moves_for_figure(row, col);
-        if(final_moves_for_figure[new_row][new_col] == 1)
+        if(final_moves_for_figure[new_row][new_col] == 1) // ruch jest dozwolony
         {
             board[new_row][new_col] = fig[0];
             board[row][col] = "0";
@@ -187,6 +187,51 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
                     board[new_row - 1][new_col] = "0";
                 }
             }
+
+            if(fig == "K_") // przeniesienie wiezy przy roszadzie krola bialego
+            {
+                if(new_row == 7 && new_col == 6) //krotka roszada
+                {
+                    board[7][5] = board[7][7][0];
+                    board[7][7] = "0";
+                }
+                if(new_row == 7 && new_col == 2) //dluga roszada
+                {
+                    board[7][3] = board[7][0][0];
+                    board[7][0] = "0";
+                }
+            }
+            if(fig == "k_") // przeniesienie wiezy przy roszadzie krola czarnego
+            {
+                if(new_row == 0 && new_col == 6) //krotka roszada
+                {
+                    board[0][5] = board[0][7][0];
+                    board[0][7] = "0";
+                }
+                if(new_row == 0 && new_col == 2) //dluga roszada
+                {
+                    board[0][3] = board[0][0][0];
+                    board[0][0] = "0";
+                }
+            }
+
+            // if(fig == "P" && new_row == 0) //promocja bialych
+            // {
+            //     promotion = true;
+            //     prom_row = new_row;
+            //     prom_col = new_col;
+            //     promotion_white = true;
+            // }
+            
+            // if(fig == "p" && new_row == 7) //promocja czarnych
+            // {
+            //     promotion = true;
+            //     prom_row = new_row;
+            //     prom_col = new_col;
+            //     promotion_white = false;
+            // }
+
+
             change_turn();
             correct_move = true;
         }
@@ -199,6 +244,40 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
     }
 }
 
+void GameEngine::promote(int row, int col, char fig)
+{
+    board[row][col] = fig;
+}
+
+void GameEngine::reset_promotion()
+{
+    promotion = false;
+    promotion_white = false;
+    prom_row = -1;
+    prom_col = -1;
+}
+
+void GameEngine::check_for_promotion()
+{
+    for(int i = 0; i < 8; i++)
+    {
+        if(board[0][i] == "P")
+        {
+            promotion = true;
+            prom_row = 0;
+            prom_col = i;
+            promotion_white = true;
+        }
+        
+        if(board[7][i] == "p")
+        {
+            promotion = true;
+            prom_row = 7;
+            prom_col = i;
+            promotion_white = false;
+        }
+    }
+}
 
 int GameEngine::sum_array(const std::array<std::array<int, 8>, 8> &myArray)
 {
