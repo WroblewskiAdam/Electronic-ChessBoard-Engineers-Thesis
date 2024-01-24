@@ -11,6 +11,7 @@ Detector::Detector()
     pinMode(sig2, INPUT);
     pinMode(sig3, INPUT);
     pinMode(sig4, INPUT);
+    pinMode(sig_start, INPUT);
 }
 
 
@@ -70,7 +71,6 @@ void Detector::scan(bool reference)
         }
         }
         if(reference) delay(10);
-        // else delay(10);
     }
         
     for(int i = 0; i < 8; i++)
@@ -96,37 +96,36 @@ void Detector::scan(bool reference)
 
 void Detector::mapToFigure()
 {
-  // prev_figures = figures;
   clearFigArray(figures);
   for(int i = 0; i < 8; i++)
   {
     for(int j = 0; j < 8; j++)
     {
-        if      (dropDown[i][j] > calibration[0][i][j] - 120)
+        if      (valueChange[i][j] > calibration[0][i][j] - 120)
             figures[i][j] = 'P'; //0 - Pawn
-        else if (dropDown[i][j] < calibration[1][i][j] + 90 && dropDown[i][j] > calibration[1][i][j] - 50)  
+        else if (valueChange[i][j] < calibration[1][i][j] + 90 && valueChange[i][j] > calibration[1][i][j] - 50)  
             figures[i][j] = 'Q'; //1 - Queen
-        else if (dropDown[i][j] < calibration[2][i][j] + 80 && dropDown[i][j] > calibration[2][i][j] - 80)
+        else if (valueChange[i][j] < calibration[2][i][j] + 80 && valueChange[i][j] > calibration[2][i][j] - 80)
             figures[i][j] = 'N'; //1,5 - Knight
-        else if (dropDown[i][j] < calibration[3][i][j] + 70 && dropDown[i][j] > calibration[3][i][j] - 60)  
+        else if (valueChange[i][j] < calibration[3][i][j] + 70 && valueChange[i][j] > calibration[3][i][j] - 60)  
             figures[i][j] = 'K'; //2,5 - King
-        else if (dropDown[i][j] < calibration[4][i][j] + 60 && dropDown[i][j] > calibration[4][i][j] - 30)  
+        else if (valueChange[i][j] < calibration[4][i][j] + 60 && valueChange[i][j] > calibration[4][i][j] - 30)  
             figures[i][j] = 'B'; //4,5 - Bishop
-        else if (dropDown[i][j] < calibration[5][i][j] + 30 && dropDown[i][j] > calibration[5][i][j] - 20)  
+        else if (valueChange[i][j] < calibration[5][i][j] + 30 && valueChange[i][j] > calibration[5][i][j] - 20)  
             figures[i][j] = 'R'; //7- Rook
         
 
-        else if (dropDown[i][j] < calibration[6][i][j] + 150)
+        else if (valueChange[i][j] < calibration[6][i][j] + 150)
             { figures[i][j] = 'p';} // -0 - pawn
-        else if (dropDown[i][j] < calibration[7][i][j] + 90 && dropDown[i][j] > calibration[7][i][j] - 150)  
+        else if (valueChange[i][j] < calibration[7][i][j] + 90 && valueChange[i][j] > calibration[7][i][j] - 150)  
             { figures[i][j] = 'q';} // -1 - queen
-        else if (dropDown[i][j] < calibration[8][i][j] + 80 && dropDown[i][j] > calibration[8][i][j] - 80)
+        else if (valueChange[i][j] < calibration[8][i][j] + 80 && valueChange[i][j] > calibration[8][i][j] - 80)
             { figures[i][j] = 'n';} // -1,5 - knight
-        else if (dropDown[i][j] < calibration[9][i][j] + 90 && dropDown[i][j] > calibration[9][i][j] - 80)  
+        else if (valueChange[i][j] < calibration[9][i][j] + 90 && valueChange[i][j] > calibration[9][i][j] - 80)  
             { figures[i][j] = 'k';} // -2,5 - king
-        else if (dropDown[i][j] < calibration[10][i][j] + 30 && dropDown[i][j] > calibration[10][i][j] - 80)  
+        else if (valueChange[i][j] < calibration[10][i][j] + 30 && valueChange[i][j] > calibration[10][i][j] - 80)  
             { figures[i][j] = 'b';} // -4,5 - bishop
-        else if (dropDown[i][j] < calibration[11][i][j] + 20 && dropDown[i][j] > calibration[11][i][j] - 30)  
+        else if (valueChange[i][j] < calibration[11][i][j] + 20 && valueChange[i][j] > calibration[11][i][j] - 30)  
             { figures[i][j] = 'r';} // -7- rook
 
     }
@@ -146,13 +145,13 @@ void Detector::clearFigArray(std::array<std::array<char, 8>, 8> &myArray)
 }
 
 
-void Detector::getDropDown()
+void Detector::getValueChange()
 {
     for(int i = 0; i < 8; i++)
     {
         for(int j = 0; j < 8; j++)
         {
-            dropDown[i][j] = rawValues[i][j] - referenceValues[i][j];
+            valueChange[i][j] = rawValues[i][j] - referenceValues[i][j];
         }
     }
 }
@@ -207,6 +206,11 @@ void Detector::clear_array(std::array<std::array<int, 8>, 8> &myArray)
     }
 }
 
+void Detector::get_start_sig()
+{
+    if(analogRead(sig_start) > 3200) start_sig_val = 1;
+    else start_sig_val = 0;
+}
 
 bool Detector::detect_board_change()
 {
@@ -230,20 +234,12 @@ void Detector::check_for_picked_fig()
 {
     if(change_row != -1 && change_col != -1)
     {  
-        if(figures[change_row][change_col] == '0' && fig_before_change[change_row][change_col] != '0' && is_fig_picked == false)
+        if(figures[change_row][change_col] == '0' && figures_before_change[change_row][change_col] != '0' && is_fig_picked == false)
         {
-            picked_fig = fig_before_change[change_row][change_col];
+            picked_fig = figures_before_change[change_row][change_col];
             is_fig_picked = true;
             picked_row = change_row;
             picked_col = change_col;
-
-            // Serial.print("2 Podniesiono: ");
-            // Serial.print("row: ");
-            // Serial.print(picked_row);
-            // Serial.print(" col: ");
-            // Serial.print(picked_col);
-            // Serial.print(" fig: ");
-            // Serial.println(picked_fig);
             }
         }
 }
@@ -252,11 +248,10 @@ void Detector::check_for_placed_back()
 {
     if(change_row != -1 && change_col != -1)
     {  
-        if(figures[change_row][change_col] != '0' && fig_before_change[change_row][change_col] == '0' 
+        if(figures[change_row][change_col] != '0' && figures_before_change[change_row][change_col] == '0' 
         && figures[change_row][change_col] == picked_fig && is_fig_picked == true 
         && picked_row == change_row && picked_col == change_col)
         {
-            // Serial.println("Wracasz na swoje miejsce");
             is_fig_picked = false;
             picked_row = -1;
             picked_col = -1;
@@ -268,34 +263,10 @@ void Detector::check_for_move()
 {
     if(change_row != -1 && change_col != -1)
     {  
-        // Serial.println("########## MOVE ########");
-        // Serial.print("Change row: ");
-        // Serial.print(change_row);
-        // Serial.print(" col: ");
-        // Serial.println(change_col);
-        // Serial.print("Picked row: ");
-        // Serial.print(picked_row);
-        // Serial.print(" col: ");
-        // Serial.println(picked_col);
-        // Serial.println(" Figs_before: ");
-        // printChar(fig_before_change);
-        // Serial.println(" Figs: ");
-        // printChar(figures);
-
-        if(figures[change_row][change_col] != '0' && fig_before_change[change_row][change_col] == '0' 
+        if(figures[change_row][change_col] != '0' && figures_before_change[change_row][change_col] == '0' 
         && figures[change_row][change_col] == picked_fig && is_fig_picked == true 
         && (picked_row != change_row || picked_col != change_col))
         {
-            // Serial.print("Ło ty kurwa spierdala   ");
-            // Serial.print(" z: ");
-            // Serial.print(picked_row);
-            // Serial.print(",");
-            // Serial.print(picked_col);
-            // Serial.print(" na: ");
-            // Serial.print(change_row);
-            // Serial.print(",");
-            // Serial.println(change_col);
-
             old_row = picked_row;
             old_col = picked_col;
             new_row = change_row;            
@@ -308,60 +279,49 @@ void Detector::check_for_move()
         }
     }
 }
-
-void Detector::check_for_new_fig()
-{
-    if(change_row != -1 && change_col != -1)
-    {  
-        if(figures[change_row][change_col] != '0' && fig_before_change[change_row][change_col] == '0' && is_fig_picked == false)
-        {
-            // Serial.print("Nowy szon na rejonie");
-            // Serial.print(" na: ");
-            // Serial.print(change_row);
-            // Serial.print(",");
-            // Serial.println(change_col);
-
-            is_fig_picked = false;
-            picked_row = -1;
-            picked_col = -1;
-        }
-    }
-}
+ 
 
 void Detector::scanBoard()
 {
+    get_start_sig();
+    board_change = false;
     prev_figures = figures;
     scan(false);
-    getDropDown();
+    getValueChange();
     mapToFigure();
     bool change = detect_board_change();
 
     if(change)
     {
-        fig_before_change = prev_figures; // zapamiętanie planszy przed zmianą
-        // Serial.println();
-        // Serial.println("Sonduje mnie stara kurwa");
-        // printChar(fig_before_change);
+        figures_before_change = prev_figures; // zapamiętanie planszy przed zmianą
+        board_change = true;
     }
 
     while(change) // przeczekanie okresu niestabilnego
     {
         prev_figures = figures;
         scan(false);
-        getDropDown();
+        getValueChange();
         mapToFigure();
         change = detect_board_change();
     }
 
-    check_for_new_fig();
     check_for_picked_fig();
     check_for_placed_back();
     check_for_move();
+}
 
-    Serial.print("detector fig picked = ");
-    Serial.print(is_fig_picked);
-    Serial.print(" | detector made_move = ");
-    Serial.println(made_move);
+
+void Detector::get_init_difference()
+{
+    clear_array(initialization_difference);
+    for(int j = 0; j < 8; j++)
+    {
+        if(figures[0][j] == start_figures[0][j]) initialization_difference[0][j] = 1;
+        if(figures[1][j] == start_figures[1][j]) initialization_difference[1][j] = 1;
+        if(figures[6][j] == start_figures[6][j]) initialization_difference[6][j] = 1;
+        if(figures[7][j] == start_figures[7][j]) initialization_difference[7][j] = 1;
+    }
 }
 
 bool Detector::check_for_init_board()
@@ -370,8 +330,9 @@ bool Detector::check_for_init_board()
     {
         for(int j = 0; j < 8; j++)
         {
-            if (figures[i][j] != start_figures[i][j])
+            if(figures[i][j] != start_figures[i][j])
             {
+                
                 Serial.print("diff on: ");
                 Serial.print(i);
                 Serial.print(" ");

@@ -140,7 +140,8 @@ void GameEngine::print_board(const std::array<std::array<int, 8>, 8> &myArray, b
 }
 
 
-void GameEngine::make_move(int row, int col, int new_row, int new_col){
+void GameEngine::
+make_move(int row, int col, int new_row, int new_col){
     std::string fig = board[row][col];
     if(fig != "0")
     {
@@ -215,32 +216,13 @@ void GameEngine::make_move(int row, int col, int new_row, int new_col){
                 }
             }
 
-            // if(fig == "P" && new_row == 0) //promocja bialych
-            // {
-            //     promotion = true;
-            //     prom_row = new_row;
-            //     prom_col = new_col;
-            //     promotion_white = true;
-            // }
-            
-            // if(fig == "p" && new_row == 7) //promocja czarnych
-            // {
-            //     promotion = true;
-            //     prom_row = new_row;
-            //     prom_col = new_col;
-            //     promotion_white = false;
-            // }
-
-
             change_turn();
             correct_move = true;
         }
         else 
         {
-            Serial.println("!!!!!!!!!!!! WRONG MOVE !!!!!!!!!!!");
             correct_move = false;
         }
-        // TODO - detekcja ruchu en passant i zbicie bierki przeciwnika
     }
 }
 
@@ -412,7 +394,6 @@ void GameEngine::get_check_saving_moves()
                 if(row == c_row && col == c_col) run = false;
             }
         }
-        // dodanie fig "nielinowych" - kon, pion
         check_saving_moves[c_row][c_col] = 1;
     }
 }
@@ -463,7 +444,6 @@ void GameEngine::get_check_saving_figures()
 
 void GameEngine::get_final_moves_for_figure(const int row, const int col)
 {
-    // && fig != 'k' && fig != 'K'
     clear_array(final_moves_for_figure);
     clear_array(final_moves);
     clear_array(final_strikes);
@@ -542,7 +522,7 @@ void GameEngine::separate_moves_strikes()
 
 bool GameEngine::check_move_for_check(int row, int col ,int new_row, int new_col) //true jestli ruch skutkuje szachem
 {
-    char fig = board[row][col][0]; // optymalizacja
+    char fig = board[row][col][0];
     board_cpy = board;
     board_cpy[new_row][new_col] = fig;
     board_cpy[row][col] = "0";

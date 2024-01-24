@@ -42,10 +42,6 @@ class MoveSolver
                                                             {0,0,0,0,0,0,0,0},
                                                             {0,0,0,0,0,0,0,0}}};
 
-        
-    
-        
-
     private:
         void get_pawn_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);
         void get_rook_moves(int row, int col, const std::array<std::array<std::string, 8>, 8> &myArray);

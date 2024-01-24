@@ -28,14 +28,13 @@ class Iluminator
         uint32_t orange = pixels.Color(255, 140, 0);
         uint32_t purple = pixels.Color(60, 0, 100);
         uint32_t pink = pixels.Color(170, 51, 106);
+        uint32_t white = pixels.Color(255, 255, 255);
 
         bool is_dark = true;
             
     private:
         const int pin = 26;
         const int pixel_num = 64;
-        // Adafruit_NeoPixel *pixels;
         Adafruit_NeoPixel pixels = Adafruit_NeoPixel(pixel_num, pin, NEO_GRB + NEO_KHZ800);
         int get_pixel_id(int row, int col);
-
 };

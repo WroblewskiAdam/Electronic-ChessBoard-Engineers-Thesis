@@ -16,7 +16,6 @@ class GameEngine
                                             {0,0,0,0,0,0,0,0},
                                             {0,0,0,0,0,0,0,0}}}; 
         
-
         std::array<std::array<int, 8>, 8> check_saving_figures = {{{0,0,0,0,0,0,0,0}, // pozycje figur gracza ktore moga "zdjac" szacha 
                                             {0,0,0,0,0,0,0,0},
                                             {0,0,0,0,0,0,0,0},
@@ -72,8 +71,6 @@ class GameEngine
                                                 {0,0,0,0,0,0,0,0}}};
 
                                                 
-                                                
-
         std::array<std::array<std::string, 8>, 8> board = {{{"0","0","0","0","0","0","0","0"}, // kodaowanie szachowncy male - czarme, duze - biale, dopisek f - figura nie wykonala jeszcze ruchu
                                         {"0","0","0","0","0","0","0","0"},
                                         {"0","0","0","0","0","0","0","0"},

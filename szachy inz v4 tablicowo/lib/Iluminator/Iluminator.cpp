@@ -20,7 +20,6 @@ void Iluminator::light(int row, int col, uint32_t color)
     is_dark = false;
 }
 
-
 void Iluminator::clear()
 {   
     if(!is_dark)

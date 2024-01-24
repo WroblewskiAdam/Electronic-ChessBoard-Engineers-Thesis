@@ -10,36 +10,35 @@
 #define sig2 34
 #define sig3 39
 #define sig4 36
+#define sig4 36
+#define sig_start 15
+
 
 
 class Detector
 {
+    private:
+        void clear_array(std::array<std::array<int, 8>, 8> &myArray);
+        void clearFigArray(std::array<std::array<char, 8>, 8> &myArray);
+        void choosePin(int Pin);
+        void mapToFigure();
+        void getValueChange();
+        void check_for_picked_fig();
+        void check_for_placed_back();
+        void check_for_move();
+
     public:
         Detector();
         void scanBoard();
         void printChar(const std::array<std::array<char, 8>, 8> &myArray);
         void printInt(const std::array<std::array<int, 8>, 8> &myArray);
-
-        void clear_array(std::array<std::array<int, 8>, 8> &myArray);
-
-    // private:
-        void clearFigArray(std::array<std::array<char, 8>, 8> &myArray);
-        void choosePin(int Pin);
-        void mapToFigure();
-        void getDropDown();
         void scan(bool reference);
         void reset();
-
         bool detect_board_change();
-
-        void check_for_picked_fig();
-        void check_for_placed_back();
-        void check_for_move();
-        void check_for_new_fig();
-
         bool check_for_init_board();
+        void get_init_difference();
+        void get_start_sig();
         
-    
         int reading_num = 50;
 
         int change_row = -1;
@@ -56,9 +55,12 @@ class Detector
         int new_col = -1;
         bool made_move = false;
 
-        int iter = 0;
+        bool board_change = false;
 
-        std::array<std::array<int, 8>, 8> referenceValues =   {{{0,0,0,0,0,0,0,0}, // potrzebne do obliczania dropdownu 
+        int iter = 0;
+        bool start_sig_val = false;
+
+        std::array<std::array<int, 8>, 8> referenceValues =   {{{0,0,0,0,0,0,0,0}, // potrzebne do obliczania valueChangeu 
                                                                 {0,0,0,0,0,0,0,0},
                                                                 {0,0,0,0,0,0,0,0},
                                                                 {0,0,0,0,0,0,0,0},
@@ -76,7 +78,7 @@ class Detector
                                                         {0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0}}};
         
-        std::array<std::array<int, 8>, 8> dropDown =  {{{0,0,0,0,0,0,0,0},
+        std::array<std::array<int, 8>, 8> valueChange =  {{{0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0},
@@ -84,6 +86,15 @@ class Detector
                                                         {0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0},
                                                         {0,0,0,0,0,0,0,0}}};
+
+        std::array<std::array<int, 8>, 8> initialization_difference = {{{0,0,0,0,0,0,0,0},
+                                                                        {0,0,0,0,0,0,0,0},
+                                                                        {0,0,0,0,0,0,0,0},
+                                                                        {0,0,0,0,0,0,0,0},
+                                                                        {0,0,0,0,0,0,0,0},
+                                                                        {0,0,0,0,0,0,0,0},
+                                                                        {0,0,0,0,0,0,0,0},
+                                                                        {0,0,0,0,0,0,0,0}}};
         
 
         std::array<std::array<char, 8>, 8> figures =  {{{'0','0','0','0','0','0','0','0'},
@@ -104,7 +115,7 @@ class Detector
                                                             {'0','0','0','0','0','0','0','0'},
                                                             {'0','0','0','0','0','0','0','0'}}};
                                                             
-        std::array<std::array<char, 8>, 8> fig_before_change = {{{'0','0','0','0','0','0','0','0'},
+        std::array<std::array<char, 8>, 8> figures_before_change = {{{'0','0','0','0','0','0','0','0'},
                                                             {'0','0','0','0','0','0','0','0'},
                                                             {'0','0','0','0','0','0','0','0'},
                                                             {'0','0','0','0','0','0','0','0'},
